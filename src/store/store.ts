@@ -1,18 +1,59 @@
+'use client';
+
 import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch, useSelector, TypedUseSelectorHook } from 'react-redux';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 import productReducer from './productSlice';
+import projectsReducer from './features/projectsSlice';
+import leadsReducer from './features/leadsSlice';
+import adminReducer from './features/adminSlice';
 
-export const store = configureStore({
-  reducer: {
-    products: productReducer,
-  },
-});
+const projectsPersistConfig = {
+  key: 'projects',
+  storage,
+  whitelist: ['projects'] // only projects will be persisted
+};
 
-// Infer the `RootState` and `AppDispatch` types from the store itself
+const leadsPersistConfig = {
+  key: 'leads',
+  storage,
+  whitelist: ['leads']
+};
+
+const adminPersistConfig = {
+  key: 'admin',
+  storage,
+  whitelist: ['password', 'isAuthenticated']
+};
+
+// Client-side store setup
+const makeStore = () => {
+  const persistedProjectsReducer = persistReducer(projectsPersistConfig, projectsReducer);
+  const persistedLeadsReducer = persistReducer(leadsPersistConfig, leadsReducer);
+  const persistedAdminReducer = persistReducer(adminPersistConfig, adminReducer);
+
+  return configureStore({
+    reducer: {
+      products: productReducer,
+      projects: persistedProjectsReducer,
+      leads: persistedLeadsReducer,
+      admin: persistedAdminReducer,
+    },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE', 'persist/REGISTER'],
+        },
+      }),
+  });
+};
+
+export const store = makeStore();
+export const persistor = persistStore(store);
+
 export type RootState = ReturnType<typeof store.getState>;
-// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;
 
-// Export a hook that can be reused to resolve types
-export const useAppDispatch: () => AppDispatch = useDispatch;
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector; 
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

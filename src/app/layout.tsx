@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "../styles/globals.css";
 import Footer from './components/Footer';
-import { ReduxProvider } from '../store/provider';
+import { Providers } from '@/components/Providers';
+import WhatsAppChat from '@/components/WhatsAppChat';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -9,16 +10,31 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: {
-    default: 'Shine Paints | Premium Paint Solution',
-    template: '%s | Shine Paints'
+    default: 'Sobha Real Estate | Premium Properties',
+    template: '%s | Sobha Real Estate'
   },
-  description: 'Transform your space with premium quality paints and expert color consultation. Discover our range of interior, exterior, and specialty paints.',
-  keywords: ['paint', 'interior paint', 'exterior paint', 'color consultation', 'premium paint', 'eco-friendly paint'],
-  authors: [{ name: 'Shine Paints' }],
-  creator: 'Shine Paints',
-  publisher: 'Shine Paints',
+  description: 'Discover exclusive properties and premium real estate solutions. Find your dream home with our expert real estate consultants.',
+  keywords: ['real estate', 'luxury homes', 'property', 'apartments', 'villas', 'real estate consultation', 'premium properties'],
+  authors: [{ name: 'Sobha Real Estate' }],
+  creator: 'Sobha Real Estate',
+  publisher: 'Sobha Real Estate',
+  openGraph: {
+    title: 'Premium Properties - Sobha Real Estate',
+    description: 'Find your dream home with our exclusive collection of luxury properties.',
+    images: [
+      {
+        url: 'https://placehold.co/1200x630/8B4513/white/png?text=Sobha+Real+Estate',
+        width: 1200,
+        height: 630,
+        alt: 'Sobha Real Estate Premium Properties',
+      },
+    ],
+  },
   formatDetection: {
     email: false,
     address: false,
@@ -46,12 +62,35 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" style={{ scrollBehavior: 'auto' }}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'RealEstateAgent',
+              name: 'Sobha Real Estate',
+              description: 'Premium real estate solutions and luxury properties',
+              url: 'https://sobharealestate.com',
+              logo: 'https://placehold.co/512x512/8B4513/white/png?text=Sobha+Real+Estate+Logo',
+              contactPoint: {
+                '@type': 'ContactPoint',
+                telephone: '+1-234-567-8900',
+                contactType: 'sales',
+                areaServed: 'US',
+                availableLanguage: ['English']
+              }
+            })
+          }}
+        />
+      </head>
       <body>
-        <ReduxProvider>
+        <Providers>
           {children}
           <Footer />
-        </ReduxProvider>
+          <WhatsAppChat />
+        </Providers>
       </body>
     </html>
   );

@@ -1,271 +1,276 @@
+'use client';
+
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "./components/Navbar";
-import type { Metadata } from 'next'
-import BestSellers from './components/BestSellers';
+import VideoBanner from './components/VideoBanner';
 import HomeHeroSlider from './components/HomeHeroSlider';
-
-export const metadata: Metadata = {
-  title: 'Premium Paint Solutions for Your Home & Business',
-  description: 'Discover our premium quality paints, expert color consultation services, and innovative paint solutions for interior and exterior applications.',
-  openGraph: {
-    title: 'Premium Paint Solutions - Shine Paints',
-    description: 'Transform your space with our premium quality paints and expert color consultation services.',
-    images: [
-      {
-        url: 'https://placehold.co/1200x630/rose/white/png?text=Shine+Paints',
-        width: 1200,
-        height: 630,
-        alt: 'Shine Paints Premium Solutions',
-      },
-    ],
-  },
-};
-
-// Add JSON-LD structured data
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'Shine Paints',
-  description: 'Premium paint solutions for interior and exterior applications',
-  url: 'https://shinepaint.com',
-  logo: 'https://placehold.co/512x512/rose/white/png?text=Shine+Paints+Logo',
-  contactPoint: {
-    '@type': 'ContactPoint',
-    telephone: '+1-234-567-8900',
-    contactType: 'customer service',
-    areaServed: 'US',
-    availableLanguage: ['English']
-  },
-  offers: {
-    '@type': 'AggregateOffer',
-    itemOffered: [
-      {
-        '@type': 'Service',
-        name: 'Interior Painting',
-        description: 'Premium interior paint solutions'
-      },
-      {
-        '@type': 'Service',
-        name: 'Exterior Painting',
-        description: 'Durable exterior paint solutions'
-      },
-      {
-        '@type': 'Service',
-        name: 'Color Consultation',
-        description: 'Expert color advisory services'
-      }
-    ]
-  }
-}
+import FeaturedPropertiesSlider from './components/FeaturedPropertiesSlider';
+import { useMemo } from 'react';
+import { useAppSelector } from '@/store/store';
 
 export default function Home() {
+  const allProjects = useAppSelector((state) => state.projects.projects);
+
+  const featuredProperties = useMemo(() => {
+    return allProjects
+      .filter(project => project.featured)
+      .slice(0, 3)
+      .map(project => ({
+        id: project.id,
+        title: project.title,
+        price: project.price,
+        location: project.location,
+        specs: project.specs,
+        image: project.image
+      }));
+  }, [allProjects]);
+
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <div className="min-h-screen bg-white">
-        <Navbar />
-        
-        {/* Hero Section with Slider */}
-        <HomeHeroSlider />
+    <div className="min-h-screen bg-white">
+      <Navbar />
 
-        {/* Trending Colors Section */}
-        <section className="relative py-20">
-          <div className="absolute inset-0">
-            <div className="h-full w-full bg-gradient-to-b from-rose-100 to-purple-100"></div>
-            <div className="absolute inset-0 bg-gradient-to-b from-white/90 to-white/80"></div>
-          </div>
-          <div className="relative container mx-auto px-6">
-            <h2 className="text-4xl font-bold mb-4 text-center text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-purple-500 animate-fade-in">
-              Trending Colors of 2024
-            </h2>
-            <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto animate-fade-in">
-              Discover this year's most inspiring color palette, carefully curated by our color experts
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {[
-                { name: "Desert Rose", color: "bg-[#E8B4B8]" },
-                { name: "Ocean Depth", color: "bg-[#1B4965]" },
-                { name: "Sage Harmony", color: "bg-[#9CAF88]" },
-                { name: "Golden Hour", color: "bg-[#F2C94C]" },
-              ].map((item, index) => (
-                <div 
-                  key={item.name} 
-                  className="group cursor-pointer transform hover:scale-105 transition-all duration-300"
-                  style={{ animationDelay: `${index * 150}ms` }}
-                >
-                  <div className={`${item.color} h-64 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300`}></div>
-                  <p className="mt-4 text-lg font-medium text-center text-gray-800 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-rose-400 group-hover:to-purple-500 transition-colors">{item.name}</p>
-                </div>
-              ))}
+      {/* Video Banner Section */}
+      <VideoBanner />
+
+      {/* Featured Properties Section */}
+      <section className="relative py-12 sm:pt-20 bg-gradient-to-b from-primary/5 to-white">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 sm:mb-12 space-y-4 sm:space-y-0">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-text-primary">
+                Featured Projects
+              </h2>
+              <p className="text-text-light mt-2 max-w-2xl">
+                Discover our handpicked selection of premium properties in the most sought-after locations
+              </p>
             </div>
-        </div>
-        </section>
-
-        {/* Featured Projects */}
-        <section className="py-20 bg-gray-50">
-          <div className="container mx-auto px-6">
-            <h2 className="text-4xl font-bold mb-4 text-center text-gray-900 animate-fade-in">Featured Projects</h2>
-            <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto animate-fade-in">
-              Get inspired by our latest transformations and see how our colors bring spaces to life
-            </p>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                { 
-                  title: "Modern Living Room", 
-                  feature: "Sage Harmony", 
-                  image: "https://img.freepik.com/free-photo/modern-living-room-with-green-wall_23-2150635372.jpg" 
-                },
-                { 
-                  title: "Serene Bedroom", 
-                  feature: "Desert Rose", 
-                  image: "https://img.freepik.com/free-photo/3d-rendering-beautiful-luxury-bedroom-suite-hotel-with-tv_105762-2063.jpg" 
-                },
-                { 
-                  title: "Contemporary Kitchen", 
-                  feature: "Ocean Depth", 
-                  image: "https://img.freepik.com/free-photo/blue-kitchen-house-modern-interior-design_23-2150670736.jpg" 
-                },
-              ].map((project, index) => (
-                <div 
-                  key={project.title}
-                  className="relative h-[500px] group overflow-hidden rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-500"
-                  style={{ animationDelay: `${index * 200}ms` }}
-                >
-                  <Image
-                    src={project.image}
-                    alt={project.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                      <h3 className="text-xl font-bold mb-2">{project.title}</h3>
-                      <p>Featuring {project.feature}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Color Inspiration */}
-        <section className="py-20">
-          <div className="container mx-auto px-6">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div className="animate-slide-up">
-                <h2 className="text-4xl font-bold mb-6 text-gray-900">Find Your Perfect Color</h2>
-                <p className="text-xl text-gray-600 mb-8">
-                  Explore our curated color palettes designed by expert color consultants.
-                  From timeless neutrals to bold statements, find the perfect shade for your space.
-                </p>
-                <div className="flex flex-wrap gap-4 mb-8">
-                  {["Neutrals", "Pastels", "Bold", "Metallics"].map((category) => (
-                    <span
-                      key={category}
-                      className="px-6 py-2 text-black bg-white rounded-full text-sm shadow-sm border border-gray-100 hover:border-rose-300 hover:shadow-md transition-all duration-300 cursor-pointer"
-                    >
-                      {category}
-                    </span>
-                  ))}
-                </div>
-                <Link
-                  href="/products"
-                  className="inline-flex items-center text-rose-500 font-semibold hover:text-purple-500 transition-colors group"
-                >
-                  Browse All Colors
-                  <svg className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </Link>
-              </div>
-              <div className="grid grid-cols-2 gap-4 animate-fade-in">
-                <div className="space-y-4">
-                  <div className="h-48 bg-[#F8E5E5] rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"></div>
-                  <div className="h-48 bg-[#D4E6F1] rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"></div>
-                </div>
-                <div className="space-y-4 pt-8">
-                  <div className="h-48 bg-[#F9E79F] rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"></div>
-                  <div className="h-48 bg-[#D5F5E3] rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Best Sellers Section */}
-        <BestSellers />
-
-        {/* Design Services */}
-        <section className="py-20 bg-gradient-to-r from-rose-400 to-purple-500">
-          <div className="container mx-auto px-6 text-center">
-            <h2 className="text-4xl font-bold mb-8 text-white animate-fade-in">Need Help with Your Project?</h2>
-            <p className="text-xl mb-12 max-w-2xl mx-auto text-white/90 animate-fade-in">
-              Our color consultants are here to help you create the perfect space.
-              Book a free consultation today.
-            </p>
             <Link
-              href="/contact"
-              className="inline-block bg-white text-gray-900 px-8 py-4 rounded-full text-lg font-semibold hover:scale-105 hover:shadow-lg transition-all duration-300 animate-bounce-in"
+              href="/projects"
+              className="inline-block bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-dark transition-all duration-300 text-center sm:text-left"
             >
-              Book Consultation
+              View All Projects
             </Link>
           </div>
-        </section>
+          <FeaturedPropertiesSlider properties={featuredProperties} />
+        </div>
+      </section>
 
-        {/* Instagram Feed Section */}
-        <section className="py-20">
-          <div className="container mx-auto px-6">
-            <h2 className="text-4xl font-bold mb-4 text-center text-gray-900 animate-fade-in">
-              Get Inspired
-            </h2>
-            <p className="text-gray-600 text-center mb-12 animate-fade-in">
-              Follow us <span className="font-semibold hover:text-rose-500 transition-colors cursor-pointer">@shinepaintsofficial</span> for daily inspiration
+      {/* What We Do Section */}
+      <section className="py-12 sm:pb-0 bg-white">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">What We Do</h2>
+            <p className="text-text-secondary text-base sm:text-lg max-w-3xl mx-auto">
+              We create exceptional living spaces that combine luxury, innovation, and sustainability
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { 
-                  title: "Interior Design Inspiration",
-                  image: "https://img.freepik.com/free-photo/modern-residential-house-interior-design_23-2150170170.jpg"
-                },
-                {
-                  title: "Color Palette Ideas",
-                  image: "https://img.freepik.com/free-photo/paint-roller-with-color-palette-guide_23-2148188273.jpg"
-                },
-                {
-                  title: "Professional Painting",
-                  image: "https://img.freepik.com/free-photo/painter-working-with-paint-roller_23-2148188289.jpg"
-                },
-                {
-                  title: "Texture & Finishes",
-                  image: "https://img.freepik.com/free-photo/close-up-paint-roller-wooden-surface_23-2148188259.jpg"
-                }
-              ].map((item) => (
-                <div 
-                  key={item.title} 
-                  className="relative aspect-square group overflow-hidden rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-500"
-                >
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="text-white font-semibold">{item.title}</h3>
-                    </div>
-                  </div>
-                </div>
-              ))}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {/* Residential Development */}
+            <div className="bg-[#f5f2f0] p-6 sm:p-8 rounded-xl hover:shadow-xl transition-all duration-300">
+              <div className="h-12 w-12 sm:h-16 sm:w-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-8 sm:w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-text-primary mb-4">Residential Development</h3>
+              <p className="text-text-secondary text-sm sm:text-base">
+                Creating luxurious apartments, villas, and premium plotted developments that set new standards in quality living.
+              </p>
+            </div>
+
+            {/* Commercial Spaces */}
+            <div className="bg-[#f5f2f0] p-6 sm:p-8 rounded-xl hover:shadow-xl transition-all duration-300">
+              <div className="h-12 w-12 sm:h-16 sm:w-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-8 sm:w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-text-primary mb-4">Commercial Spaces</h3>
+              <p className="text-text-secondary text-sm sm:text-base">
+                Developing state-of-the-art office spaces, retail destinations, and integrated commercial complexes.
+              </p>
+            </div>
+
+            {/* Property Management */}
+            <div className="bg-[#f5f2f0] p-6 sm:p-8 rounded-xl hover:shadow-xl transition-all duration-300">
+              <div className="h-12 w-12 sm:h-16 sm:w-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-8 sm:w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-text-primary mb-4">Property Management</h3>
+              <p className="text-text-secondary text-sm sm:text-base">
+                Providing comprehensive property management services to ensure lasting value and resident satisfaction.
+              </p>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
+
+      {/* Why Choose Us Section */}
+      <section className="py-12 sm:pt-20 bg-gradient-to-b from-white via-primary/5 to-white">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-text-primary">Why Choose Sobha Real Estate</h2>
+            <p className="text-base sm:text-lg text-text-light max-w-2xl mx-auto">
+              With over 25 years of excellence in real estate development, we deliver unparalleled quality and craftsmanship in every project.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-12 gap-8 items-start">
+            <div className="md:col-span-12 space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                {[
+                  {
+                    title: "Unmatched Quality",
+                    description: "Superior quality control at every stage with our backward integration model.",
+                    icon: "🏆"
+                  },
+                  {
+                    title: "Prime Locations",
+                    description: "Strategic properties in premium areas with excellent connectivity.",
+                    icon: "📍"
+                  },
+                  {
+                    title: "Award-Winning Designs",
+                    description: "Architectural excellence blending aesthetics with functionality.",
+                    icon: "🎨"
+                  },
+                  {
+                    title: "Customer-First",
+                    description: "Dedicated support and personalized consultations at every step.",
+                    icon: "👥"
+                  },
+                  {
+                    title: "Sustainable Living",
+                    description: "Eco-friendly practices and energy-efficient technologies.",
+                    icon: "🌱"
+                  },
+                  {
+                    title: "Proven Legacy",
+                    description: "1000+ premium properties with 98% client satisfaction.",
+                    icon: "📈"
+                  }
+                ].map((feature) => (
+                  <div
+                    key={feature.title}
+                    className="bg-white rounded-xl p-5 shadow-sm hover:shadow-lg transition-all duration-300 border border-primary/10"
+                  >
+                    <div className="flex items-center mb-3">
+                      <span className="text-2xl mr-3">{feature.icon}</span>
+                      <h3 className="text-lg font-semibold text-text-primary">{feature.title}</h3>
+                    </div>
+                    <p className="text-text-light text-sm">{feature.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-12 sm:pb-28 bg-gradient-to-b from-white via-primary/5 to-white">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-base sm:text-lg text-text-light max-w-2xl mx-auto">
+              Find answers to common questions about our properties and services
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 sm:gap-8 max-w-6xl mx-auto">
+            {/* First Column */}
+            <div className="space-y-4">
+              <details className="group bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 [&_summary::-webkit-details-marker]:hidden [&[open]>div]:animate-[slideDown_0.2s_ease-in-out]">
+                <summary className="flex items-center justify-between p-6 cursor-pointer list-none font-semibold text-text-primary">
+                  When is the launch of SOBHA QUEENS?
+                  <span className="transition-transform duration-300 group-open:rotate-180">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="px-6 pb-6 text-text-secondary">
+                  Yet to be launched in the month of December.
+                </div>
+              </details>
+
+              <details className="group bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 [&_summary::-webkit-details-marker]:hidden [&[open]>div]:animate-[slideDown_0.2s_ease-in-out]">
+                <summary className="flex items-center justify-between p-6 cursor-pointer list-none font-semibold text-text-primary">
+                  How many apartments are there in SOBHA QUEENS Towers?
+                  <span className="transition-transform duration-300 group-open:rotate-180">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="px-6 pb-6 text-text-secondary">
+                  SOBHA QUEENS Towers has a total of 2000+ apartments.
+                </div>
+              </details>
+            </div>
+
+            {/* Second Column */}
+            <div className="space-y-4">
+              <details className="group bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 [&_summary::-webkit-details-marker]:hidden [&[open]>div]:animate-[slideDown_0.2s_ease-in-out]">
+                <summary className="flex items-center justify-between p-6 cursor-pointer list-none font-semibold text-text-primary">
+                  Where is SOBHA QUEENS located?
+                  <span className="transition-transform duration-300 group-open:rotate-180">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="px-6 pb-6 text-text-secondary">
+                  SOBHA Manhattan Towers – Townpark is located near Electronic City, Hosur Rd, Bengaluru, Karnataka.
+                </div>
+              </details>
+
+              <details className="group bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 [&_summary::-webkit-details-marker]:hidden [&[open]>div]:animate-[slideDown_0.2s_ease-in-out]">
+                <summary className="flex items-center justify-between p-6 cursor-pointer list-none font-semibold text-text-primary">
+                  What is the total area size of SOBHA QUEENS Towers?
+                  <span className="transition-transform duration-300 group-open:rotate-180">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="px-6 pb-6 text-text-secondary">
+                  The total area size of SOBHA QUEENS Towers is 33 acres.
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="py-16 sm:py-24 bg-gradient-to-br from-[#1a1a1a] to-[#404040]">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="max-w-4xl mx-auto bg-white/5 backdrop-blur-lg rounded-2xl p-8 sm:p-12 text-center">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6 text-white">
+              Ready to Find Your Dream Home?
+            </h2>
+            <p className="text-lg sm:text-xl mb-8 sm:mb-10 text-white/90 max-w-2xl mx-auto">
+              Schedule a consultation with our real estate experts today and take the first step towards your dream home.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link
+                href="/contact"
+                className="w-full sm:w-auto inline-block bg-white text-black px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold hover:scale-105 hover:shadow-lg transition-all duration-300"
+              >
+                Schedule Consultation
+              </Link>
+
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
-    </>
   );
 }
