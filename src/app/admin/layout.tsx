@@ -90,7 +90,7 @@ export default function AdminLayout({
                   href={item.href}
                   className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg ${
                     isActive
-                      ? 'bg-primary text-white'
+                      ? 'bg-primary '
                       : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >

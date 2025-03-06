@@ -1,3 +1,99 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities; 
+@tailwind utilities;
+
+@layer base {
+  /* Selection styles */
+  ::selection {
+    @apply bg-blue-500/30 text-inherit;
+  }
+  
+  /* Default hover styles for interactive elements */
+  a:hover, button:hover {
+    @apply opacity-80 transition-opacity;
+  }
+
+  /* Ensure text remains visible during hover/focus states */
+  a:hover, button:hover, 
+  a:focus, button:focus {
+    @apply text-inherit;
+  }
+
+  /* Custom hover background for interactive elements */
+  .hover-bg {
+    @apply hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors;
+  }
+
+  /* Custom hover effect for cards */
+  .card-hover {
+    @apply hover:shadow-lg transition-shadow duration-300;
+  }
+}
+
+@layer components {
+  /* Text color utilities */
+  .text-on-primary {
+    @apply text-gray-900;
+  }
+
+  .text-on-dark {
+    @apply text-gray-900;
+  }
+
+  .text-on-light {
+    @apply text-gray-900;
+  }
+
+  /* Button styles */
+  .btn-primary {
+    @apply bg-primary text-gray-900 hover:bg-primary/90 transition-colors;
+  }
+
+  .btn-dark {
+    @apply bg-gray-900 text-gray-100 hover:bg-gray-800 transition-colors;
+  }
+
+  .btn-light {
+    @apply bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors;
+  }
+}
+
+/* Custom hover styles for navigation items */
+.nav-item {
+  @apply relative;
+}
+
+.nav-item::after {
+  @apply content-[''] absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300;
+}
+
+.nav-item:hover::after {
+  @apply w-full;
+}
+
+/* Admin specific styles */
+.admin-nav-link {
+  @apply flex items-center px-4 py-3 text-sm font-medium transition-all duration-200 
+         text-gray-700 hover:text-gray-900
+         border-l-2 border-transparent
+         hover:bg-gray-50;
+}
+
+.admin-nav-link.active {
+  @apply bg-gray-100 
+         text-gray-900 
+         border-l-2 border-gray-900 
+         font-semibold;
+}
+
+.admin-nav-link .icon {
+  @apply mr-3 h-5 w-5 transition-colors text-gray-500;
+}
+
+.admin-nav-link:hover .icon {
+  @apply text-gray-700;
+}
+
+.admin-nav-link.active .icon {
+  @apply text-gray-900;
+} 

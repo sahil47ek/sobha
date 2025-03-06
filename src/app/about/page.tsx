@@ -176,7 +176,7 @@ export default function About() {
       {/* Values Section */}
       <section className="py-20 bg-secondary">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-text-primary text-center mb-12">Our Core Values</h2>
+          <h2 className="text-3xl font-bold text-white text-center mb-12">Our Core Values</h2>
           <div className="grid md:grid-cols-4 gap-8">
             {[
               {
