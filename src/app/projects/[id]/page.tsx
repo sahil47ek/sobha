@@ -96,7 +96,7 @@ export default function ProjectPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-          <div className="container mx-auto">
+          <div className="container mx-auto px-6">
             <div className="max-w-4xl">
               <div className="flex flex-wrap gap-2 mb-4">
                 {projectBadges.map((badge, index) => (
@@ -119,7 +119,7 @@ export default function ProjectPage() {
       {/* Content Section */}
       <section className="py-12">
         <div className="container mx-auto">
-          <div className="space-y-12">
+          <div className="space-y-12 px-6">
             {/* Main Content */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left Column - About and Gallery */}

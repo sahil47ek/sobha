@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useAppDispatch } from '@/store/store';
+import { addLead } from '@/store/features/leadsSlice';
+import { toast } from 'react-hot-toast';
 
 interface ProjectEnquiryFormProps {
   projectId: string;
@@ -14,6 +17,7 @@ interface FormData {
 }
 
 export default function ProjectEnquiryForm({ projectId, projectTitle }: ProjectEnquiryFormProps) {
+  const dispatch = useAppDispatch();
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -23,12 +27,12 @@ export default function ProjectEnquiryForm({ projectId, projectTitle }: ProjectE
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const redirectToWhatsApp = (formData: FormData) => {
+  const redirectToWhatsApp = (data: FormData) => {
     const message = `*New Project Enquiry*%0A
 Project: ${projectTitle}%0A
-Name: ${formData.name}%0A
-Email: ${formData.email}%0A
-Phone: ${formData.phone}`;
+Name: ${data.name}%0A
+Email: ${data.email}%0A
+Phone: ${data.phone}`;
     
     window.open(`https://wa.me/+919999999999?text=${message}`, '_blank');
   };
@@ -40,7 +44,24 @@ Phone: ${formData.phone}`;
     setErrorMessage('');
 
     try {
-      // Submit to admin leads
+      // Validate form data
+      if (!formData.name || !formData.email || !formData.phone) {
+        throw new Error('Please fill in all required fields');
+      }
+
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      // Basic phone validation (10 digits)
+      const phoneRegex = /^\d{10}$/;
+      if (!phoneRegex.test(formData.phone.replace(/[^0-9]/g, ''))) {
+        throw new Error('Please enter a valid phone number');
+      }
+
+      // Submit to admin leads API
       const response = await fetch('/api/enquiry', {
         method: 'POST',
         headers: {
@@ -59,8 +80,16 @@ Phone: ${formData.phone}`;
       if (!response.ok) {
         throw new Error(data.error || 'Failed to submit enquiry');
       }
+
+      // Add to Redux store
+      dispatch(addLead({
+        ...formData,
+        propertyInterest: projectTitle,
+        message: `Interested in ${projectTitle}`
+      }));
       
-      // Reset form and show success message
+      // Show success message
+      toast.success('Thank you for your interest! Our team will contact you soon.');
       setSubmitStatus('success');
       
       // Redirect to WhatsApp
@@ -71,6 +100,7 @@ Phone: ${formData.phone}`;
     } catch (error) {
       setSubmitStatus('error');
       setErrorMessage(error instanceof Error ? error.message : 'Something went wrong');
+      toast.error(error instanceof Error ? error.message : 'Something went wrong');
     } finally {
       setIsSubmitting(false);
     }

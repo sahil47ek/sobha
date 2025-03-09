@@ -3,12 +3,12 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, phone, projectId, projectTitle } = body;
+    const { name, email, phone, source } = body;
 
     // Validate required fields
-    if (!name || !email || !phone || !projectId || !projectTitle) {
+    if (!name || !email || !phone) {
       return NextResponse.json(
-        { error: 'All fields are required' },
+        { error: 'Name, email, and phone are required' },
         { status: 400 }
       );
     }
@@ -24,11 +24,33 @@ export async function POST(request: Request) {
 
     // Validate phone format (10 digits)
     const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phone)) {
+    if (!phoneRegex.test(phone.replace(/[^0-9]/g, ''))) {
       return NextResponse.json(
         { error: 'Invalid phone number format' },
         { status: 400 }
       );
+    }
+
+    // Additional validation for project enquiries
+    if (source === 'Project Enquiry') {
+      const { projectId, projectTitle } = body;
+      if (!projectId || !projectTitle) {
+        return NextResponse.json(
+          { error: 'Project ID and title are required for project enquiries' },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Additional validation for contact form
+    if (source === 'Contact Form') {
+      const { propertyInterest, message } = body;
+      if (!propertyInterest || !message) {
+        return NextResponse.json(
+          { error: 'Property interest and message are required for contact form' },
+          { status: 400 }
+        );
+      }
     }
 
     // Here you would typically:
@@ -43,7 +65,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { 
         message: 'Enquiry received successfully',
-        enquiry: { name, email, phone, projectId, projectTitle }
+        enquiry: body
       },
       { status: 200 }
     );
