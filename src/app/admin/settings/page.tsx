@@ -118,8 +118,8 @@ export default function Settings() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full px-4 py-2 text-white bg-primary rounded-lg font-medium 
-                ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary-dark'}
+              className={`w-full px-4 py-3 text-white bg-black rounded-lg font-medium 
+                ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary-dark hover:text-white'}
                 transition-colors duration-200`}
             >
               {isSubmitting ? 'Updating...' : 'Update Password'}

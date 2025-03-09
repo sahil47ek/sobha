@@ -65,7 +65,7 @@ export default function ProjectEnquiryForm({ projectId, projectTitle }: ProjectE
   };
 
   return (
-    <div className="bg-primary rounded-xl p-6 text-white">
+    <div className="bg-black rounded-xl p-6 text-white">
       <h3 className="text-xl font-bold mb-4">Interested in {projectTitle}?</h3>
       <p className="mb-6">Fill out the form below and we'll get back to you shortly.</p>
       
@@ -114,7 +114,7 @@ export default function ProjectEnquiryForm({ projectId, projectTitle }: ProjectE
           className={`w-full px-6 py-3 bg-white font-medium rounded-lg transition-all duration-200 ${
             isSubmitting
               ? 'opacity-70 cursor-not-allowed'
-              : 'hover:bg-white/90 text-primary'
+              : 'hover:bg-white/90 hover:text-black text-black'
           }`}
         >
           {isSubmitting ? 'Sending...' : 'Request Information'}

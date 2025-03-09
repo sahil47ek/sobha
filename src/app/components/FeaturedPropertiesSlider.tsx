@@ -79,7 +79,7 @@ export default function FeaturedPropertiesSlider({ properties }: FeaturedPropert
                       <p className="text-2xl font-bold text-white mb-4">{property.price}</p>
                       <Link
                         href={`/projects/${property.id}`}
-                        className="inline-block bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all duration-300"
+                        className="inline-block bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-black transition-all duration-300"
                       >
                         View Details
                       </Link>

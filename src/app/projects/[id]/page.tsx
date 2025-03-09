@@ -118,7 +118,7 @@ export default function ProjectPage() {
 
       {/* Content Section */}
       <section className="py-12">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto">
           <div className="space-y-12">
             {/* Main Content */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

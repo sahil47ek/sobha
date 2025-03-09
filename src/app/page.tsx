@@ -47,7 +47,7 @@ export default function Home() {
             </div>
             <Link
               href="/projects"
-              className="inline-block bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-dark transition-all duration-300 text-center sm:text-left"
+              className="inline-block bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-dark hover:text-white transition-all duration-300 text-center sm:text-left"
             >
               View All Projects
             </Link>
@@ -109,70 +109,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Why Choose Us Section */}
-      <section className="py-12 sm:pt-20 bg-gradient-to-b from-white via-primary/5 to-white">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="text-center mb-8 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-text-primary">Why Choose Sobha Real Estate</h2>
-            <p className="text-base sm:text-lg text-text-light max-w-2xl mx-auto">
-              With over 25 years of excellence in real estate development, we deliver unparalleled quality and craftsmanship in every project.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-12 gap-8 items-start">
-            <div className="md:col-span-12 space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-                {[
-                  {
-                    title: "Unmatched Quality",
-                    description: "Superior quality control at every stage with our backward integration model.",
-                    icon: "🏆"
-                  },
-                  {
-                    title: "Prime Locations",
-                    description: "Strategic properties in premium areas with excellent connectivity.",
-                    icon: "📍"
-                  },
-                  {
-                    title: "Award-Winning Designs",
-                    description: "Architectural excellence blending aesthetics with functionality.",
-                    icon: "🎨"
-                  },
-                  {
-                    title: "Customer-First",
-                    description: "Dedicated support and personalized consultations at every step.",
-                    icon: "👥"
-                  },
-                  {
-                    title: "Sustainable Living",
-                    description: "Eco-friendly practices and energy-efficient technologies.",
-                    icon: "🌱"
-                  },
-                  {
-                    title: "Proven Legacy",
-                    description: "1000+ premium properties with 98% client satisfaction.",
-                    icon: "📈"
-                  }
-                ].map((feature) => (
-                  <div
-                    key={feature.title}
-                    className="bg-white rounded-xl p-5 shadow-sm hover:shadow-lg transition-all duration-300 border border-primary/10"
-                  >
-                    <div className="flex items-center mb-3">
-                      <span className="text-2xl mr-3">{feature.icon}</span>
-                      <h3 className="text-lg font-semibold text-text-primary">{feature.title}</h3>
-                    </div>
-                    <p className="text-text-light text-sm">{feature.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* FAQ Section */}
-      <section className="py-12 sm:pb-28 bg-gradient-to-b from-white via-primary/5 to-white">
+      <section className="py-20 sm:pb-24 bg-gradient-to-b from-white via-primary/5 to-white">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-text-primary mb-4">

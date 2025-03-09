@@ -60,7 +60,7 @@ export default function Login() {
         </div>
 
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white/80 backdrop-blur-sm py-8 px-4 shadow-2xl sm:rounded-xl sm:px-10 border border-primary/10">
+          <div className="bg-white/80 backdrop-blur-sm pt-8 pb-12 px-4 shadow-2xl sm:rounded-xl sm:px-10 border border-primary/10">
             <div className="flex justify-center mb-6">
               <div className="bg-primary/10 rounded-full p-3">
                 <LockClosedIcon className="h-6 w-6 text-primary" />
@@ -95,7 +95,7 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 ${
+                  className={`w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-black hover:bg-primary-dark hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 ${
                     isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:scale-[1.02]'
                   }`}
                 >
