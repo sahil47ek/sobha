@@ -2,6 +2,21 @@
 
 import { useState } from 'react';
 import { submitContactForm } from '../actions/contact';
+import CustomDropdown from '@/components/CustomDropdown';
+
+interface FormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+const subjectOptions = [
+  { value: 'product', label: 'Product Inquiry' },
+  { value: 'consultation', label: 'Color Consultation' },
+  { value: 'support', label: 'Technical Support' },
+  { value: 'other', label: 'Other' }
+];
 
 export default function ContactForm() {
   const [formStatus, setFormStatus] = useState<{
@@ -13,27 +28,71 @@ export default function ContactForm() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+
+  const redirectToWhatsApp = (data: FormData) => {
+    const message = `*New Contact Form Submission*%0A
+Name: ${data.name}%0A
+Email: ${data.email}%0A
+Subject: ${data.subject}%0A
+Message: ${data.message}`;
+    
+    window.open(`https://wa.me/+919999999999?text=${message}`, '_blank');
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    const formData = new FormData(e.currentTarget);
-    const data = {
-      name: formData.get('name') as string,
-      email: formData.get('email') as string,
-      subject: formData.get('subject') as string,
-      message: formData.get('message') as string
-    };
-
     try {
-      const result = await submitContactForm(data);
+      // Submit to admin leads
+      const response = await fetch('/api/enquiry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          source: 'Contact Form'
+        }),
+      });
+
+      const apiData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(apiData.error || 'Failed to submit enquiry');
+      }
+
+      // Submit to contact form handler
+      const result = await submitContactForm(formData);
+      
       setFormStatus({
         type: result.success ? 'success' : 'error',
         message: result.message
       });
+
       if (result.success) {
-        (e.target as HTMLFormElement).reset();
+        // Redirect to WhatsApp
+        redirectToWhatsApp(formData);
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: ''
+        });
       }
     } catch (error) {
       setFormStatus({
@@ -78,6 +137,8 @@ export default function ContactForm() {
                   type="text"
                   id="name"
                   name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
                   required
                   disabled={isSubmitting}
@@ -94,6 +155,8 @@ export default function ContactForm() {
                   type="email"
                   id="email"
                   name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
                   required
                   disabled={isSubmitting}
@@ -106,19 +169,15 @@ export default function ContactForm() {
                 >
                   Subject
                 </label>
-                <select
-                  id="subject"
-                  name="subject"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                  required
-                  disabled={isSubmitting}
-                >
-                  <option value="">Select a topic</option>
-                  <option value="product">Product Inquiry</option>
-                  <option value="consultation">Color Consultation</option>
-                  <option value="support">Technical Support</option>
-                  <option value="other">Other</option>
-                </select>
+                <CustomDropdown
+                  options={subjectOptions}
+                  value={formData.subject}
+                  onChange={(value) => handleChange({
+                    target: { name: 'subject', value }
+                  } as React.ChangeEvent<HTMLSelectElement>)}
+                  placeholder="Select a topic"
+                  className="w-full"
+                />
               </div>
               <div>
                 <label 
@@ -130,6 +189,8 @@ export default function ContactForm() {
                 <textarea
                   id="message"
                   name="message"
+                  value={formData.message}
+                  onChange={handleChange}
                   rows={4}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
                   required
@@ -139,7 +200,7 @@ export default function ContactForm() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full bg-gradient-to-r from-rose-400 to-purple-500 text-white py-3 px-6 rounded-lg transition-all ${
+                className={`w-full bg-gradient-to-r from-rose-400 to-purple-500 text-gray-100 py-3 px-6 rounded-lg transition-all ${
                   isSubmitting
                     ? 'opacity-70 cursor-not-allowed'
                     : 'hover:opacity-90'
@@ -148,7 +209,7 @@ export default function ContactForm() {
                 {isSubmitting ? (
                   <span className="flex items-center justify-center">
                     <svg
-                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-100"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"

@@ -187,8 +187,8 @@ export default function Contact() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full bg-primary text-white py-4 rounded-lg text-lg font-semibold transition-all duration-300 
-                    ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary-dark'}`}
+                  className={`w-full bg-black text-white py-4 rounded-lg text-lg font-semibold transition-all duration-300 
+                    ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary-dark hover:text-white'}`}
                 >
                   {isSubmitting ? 'Sending...' : 'Send Message'}
                 </button>
