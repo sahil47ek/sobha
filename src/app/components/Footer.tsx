@@ -36,13 +36,13 @@ export default function Footer() {
                 <PhoneIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span className="text-sm sm:text-base">080 4960 5000</span>
               </a>
-              <a href="mailto:contact@sobha.com" className="flex items-center space-x-3 text-text-primary hover:text-primary transition-colors">
+              <a href="mailto:sales@sobha.com" className="flex items-center space-x-3 text-text-primary hover:text-primary transition-colors">
                 <EnvelopeIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="text-sm sm:text-base">contact@sobha.com</span>
+                <span className="text-sm sm:text-base">sales@sobha.com</span>
               </a>
               <div className="flex items-start space-x-3 text-text-primary">
                 <MapPinIcon className="h-4 w-4 sm:h-5 sm:w-5 mt-1" />
-                <span className="text-sm sm:text-base">Sobha Corporate Office, Bangalore</span>
+                <span className="text-sm sm:text-base">SOBHA Corporate Office, Sarjapur - Marathahalli Outer Ring Road, Devarabisanahalli, Bellandur Post, Bangalore - 560103</span>
               </div>
             </div>
           </div>
@@ -66,7 +66,7 @@ export default function Footer() {
           {/* Cities */}
           <div className="sm:col-span-2 lg:col-span-4">
             <h3 className="text-base sm:text-lg font-semibold text-text-primary mb-4 sm:mb-6">Our Presence</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 sm:gap-x-6 gap-y-2 sm:gap-y-3">
+            <div className="grid grid-cols-2 sm:grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-2 sm:gap-y-3">
               {cities.map((city) => (
                 <span key={city} className="text-sm sm:text-base text-text-primary">
                   {city}
@@ -79,19 +79,19 @@ export default function Footer() {
           <div className="sm:col-span-2 lg:col-span-3">
             <h3 className="text-base sm:text-lg font-semibold text-text-primary mb-4 sm:mb-6">Stay Updated</h3>
             <p className="text-sm sm:text-base text-text-primary mb-4">
-              Subscribe to our newsletter for the latest updates and exclusive offers.
+              Subscribe to our newsletter to receive exclusive updates about new project launches, special offers, and real estate insights.
             </p>
             <form className="space-y-3">
               <input
                 type="email"
-                placeholder="Your email address"
+                placeholder="Enter your email address"
                 className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border border-primary/20 focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
               <button
                 type="submit"
                 className="w-full px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white bg-black rounded-lg font-medium hover:bg-black/80 transition-colors duration-300"
               >
-                Subscribe
+                Subscribe Now
               </button>
             </form>
           </div>
@@ -103,11 +103,12 @@ export default function Footer() {
           <div className="mb-6 sm:mb-8">
             <p className="text-xs sm:text-sm font-semibold text-text-primary mb-3 sm:mb-4">DISCLAIMER:</p>
             <p className="text-xs sm:text-sm text-text-primary/80 leading-relaxed">
-              The content is for information purposes only and does not constitute an offer to avail of any service. 
-              Prices mentioned are subject to change without notice and properties mentioned are subject to availability. 
-              Images for representation purposes only. The logos and images used on this website are the exclusive property 
-              of Sobha Ltd. and are protected under applicable copyright laws. We do not claim any ownership or rights to 
-              these materials, and they are used on this website solely for informational purposes.
+              The content provided on this website is for information purposes only and does not constitute an offer to avail of any service. 
+              Prices mentioned are subject to change without notice and properties mentioned are subject to availability. Images used are for 
+              representation purposes only. Maps are not to scale. Floor plans, specifications, fixtures, details, and dimensions are approximate 
+              and subject to change without notice. The company reserves the right to modify the plans, specifications, and features without 
+              prior notice. All trademarks, logos, images, and intellectual property displayed are legally owned by SOBHA Limited. 
+              This website is for the exclusive use of persons in India. By accessing this website, you agree to its terms of use.
             </p>
           </div>
 
