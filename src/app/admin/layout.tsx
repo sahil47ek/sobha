@@ -32,6 +32,15 @@ export default function AdminLayout({
   const dispatch = useAppDispatch();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
+  const isActiveRoute = (href: string) => {
+    if (href === '/admin') {
+      // For dashboard, only match exact path
+      return pathname === '/admin';
+    }
+    // For other routes, match the path and its sub-paths
+    return pathname === href || pathname?.startsWith(href + '/');
+  };
+
   // Check and restore authentication state from cookie
   useEffect(() => {
     const checkAuth = () => {
@@ -83,18 +92,18 @@ export default function AdminLayout({
           {/* Navigation */}
           <nav className="flex-1 px-2 py-4 space-y-1">
             {menuItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = isActiveRoute(item.href);
               return (
                 <Link
                   key={item.name}
                   href={item.href}
                   className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-300 ${
                     isActive
-                      ? 'bg-black text-white'
+                      ? 'bg-black !text-white'
                       : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
-                  <item.icon className={`w-5 h-5 mr-3 ${isActive ? 'text-white' : 'text-gray-500'}`} />
+                  <item.icon className={`w-5 h-5 mr-3 ${isActive ? '!text-white' : 'text-gray-500'}`} />
                   {item.name}
                 </Link>
               );
