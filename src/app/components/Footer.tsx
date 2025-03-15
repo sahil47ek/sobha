@@ -41,8 +41,8 @@ export default function Footer() {
                 <span className="text-sm sm:text-base">sales@sobha.com</span>
               </a>
               <div className="flex items-start space-x-3 text-text-primary">
-                <MapPinIcon className="h-4 w-4 sm:h-5 sm:w-5 mt-1" />
-                <span className="text-sm sm:text-base">SOBHA Corporate Office, Sarjapur - Marathahalli Outer Ring Road, Devarabisanahalli, Bellandur Post, Bangalore - 560103</span>
+                {/* <MapPinIcon className="h-4 w-4 sm:h-5 sm:w-5 mt-1" /> */}
+                <span className="text-sm sm:text-md">SOBHA Corporate Office, Sarjapur - Marathahalli Outer Ring Road, Devarabisanahalli, Bellandur Post, Bangalore - 560103</span>
               </div>
             </div>
           </div>
@@ -98,7 +98,7 @@ export default function Footer() {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-primary/10 mt-8 sm:mt-16 py-6 sm:py-8">
+        <div className="border-t border-primary/10 mt-8 sm:mt-8 py-6 sm:py-8">
           {/* Disclaimer */}
           <div className="mb-6 sm:mb-8">
             <p className="text-xs sm:text-sm font-semibold text-text-primary mb-3 sm:mb-4">DISCLAIMER:</p>

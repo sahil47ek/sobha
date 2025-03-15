@@ -154,7 +154,7 @@ export default function ProjectsManagement() {
         </div>
         <button
           onClick={() => handleAddEdit()}
-          className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+          className="flex items-center px-4 py-2 text-white bg-black rounded-lg hover:bg-black/80 transition-colors duration-300"
         >
           <PlusIcon className="w-5 h-5 mr-2" />
           Add Project
@@ -251,13 +251,13 @@ export default function ProjectsManagement() {
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => handleAddEdit(project)}
-                    className="text-primary hover:text-primary-dark mr-3"
+                    className="text-black hover:text-black/80 mr-3 transition-colors duration-300"
                   >
                     <PencilIcon className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => handleDelete(project.id)}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-black hover:text-black/80 transition-colors duration-300"
                   >
                     <TrashIcon className="w-5 h-5" />
                   </button>
@@ -582,13 +582,13 @@ export default function ProjectsManagement() {
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="px-4 py-2 text-black border border-black hover:bg-black/5 rounded-lg transition-colors duration-300"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+                  className="px-4 py-2 bg-black text-white rounded-lg hover:bg-black/80 transition-colors duration-300"
                 >
                   {editingProject ? 'Update Project' : 'Add Project'}
                 </button>

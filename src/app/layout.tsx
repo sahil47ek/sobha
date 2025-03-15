@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "../styles/globals.css";
-import Footer from './components/Footer';
-import { Providers } from '@/components/Providers';
-import WhatsAppChat from '@/components/WhatsAppChat';
+import RootLayoutClient from './components/RootLayoutClient';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -86,11 +84,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <Providers>
+        <RootLayoutClient>
           {children}
-          <Footer />
-          <WhatsAppChat />
-        </Providers>
+        </RootLayoutClient>
       </body>
     </html>
   );

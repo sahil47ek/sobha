@@ -197,7 +197,7 @@ export default function ProductsManagement() {
         </div>
         <button
           onClick={handleAddProduct}
-          className="px-6 py-3 bg-gradient-to-r from-rose-400 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all duration-300"
+          className="px-6 py-3 bg-black text-white rounded-lg hover:bg-black/80 transition-colors duration-300"
         >
           Add New Product
         </button>
@@ -438,13 +438,13 @@ export default function ProductsManagement() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
                     <button
                       onClick={() => handleEditProduct(product)}
-                      className="text-blue-600 hover:text-blue-900"
+                      className="text-black hover:text-black/80 transition-colors duration-300"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeleteProduct(product.id)}
-                      className="text-red-600 hover:text-red-900"
+                      className="text-black hover:text-black/80 transition-colors duration-300 ml-3"
                     >
                       Delete
                     </button>
@@ -639,13 +639,13 @@ export default function ProductsManagement() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-6 py-2 border rounded-lg hover:bg-gray-50"
+                  className="px-6 py-2 text-black border border-black hover:bg-black/5 rounded-lg transition-colors duration-300"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-gradient-to-r from-rose-400 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all duration-300"
+                  className="px-6 py-2 bg-black text-white rounded-lg hover:bg-black/80 transition-colors duration-300"
                 >
                   {editingProduct ? 'Update Product' : 'Add Product'}
                 </button>

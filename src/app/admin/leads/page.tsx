@@ -129,7 +129,7 @@ export default function LeadsManagement() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <button
                         onClick={() => handleDelete(lead.id)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-black hover:text-black/80 transition-colors duration-300"
                       >
                         Delete
                       </button>

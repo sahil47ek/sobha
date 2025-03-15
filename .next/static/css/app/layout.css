@@ -735,6 +735,12 @@ video {
 .mt-8 {
   margin-top: 2rem;
 }
+.mt-0 {
+  margin-top: 0px;
+}
+.ml-3 {
+  margin-left: 0.75rem;
+}
 .line-clamp-2 {
   overflow: hidden;
   display: -webkit-box;
@@ -1225,6 +1231,10 @@ video {
 .border-white {
   --tw-border-opacity: 1;
   border-color: rgb(255 255 255 / var(--tw-border-opacity, 1));
+}
+.border-black {
+  --tw-border-opacity: 1;
+  border-color: rgb(0 0 0 / var(--tw-border-opacity, 1));
 }
 .border-t-transparent {
   border-top-color: transparent;
@@ -2109,6 +2119,10 @@ video {
   background-color: rgb(255 255 255 / 0.75);
 }
 
+.hover\:bg-black\/5:hover {
+  background-color: rgb(0 0 0 / 0.05);
+}
+
 .hover\:bg-opacity-90:hover {
   --tw-bg-opacity: 0.9;
 }
@@ -2141,6 +2155,10 @@ video {
 .hover\:text-white:hover {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+.hover\:text-black\/80:hover {
+  color: rgb(0 0 0 / 0.8);
 }
 
 .hover\:opacity-80:hover {
