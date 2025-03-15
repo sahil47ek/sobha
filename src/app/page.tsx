@@ -34,7 +34,7 @@ export default function Home() {
       <VideoBanner />
 
       {/* Featured Properties Section */}
-      <section className="relative py-8 sm:pt-20 bg-gradient-to-b from-primary/5 to-white">
+      <section className="relative py-8 sm:py-20 bg-gradient-to-b from-primary/5 to-white">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 sm:mb-12 space-y-4 sm:space-y-0">
             <div>
