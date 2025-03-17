@@ -9,32 +9,109 @@ import { useAppSelector } from '@/store/store';
 import { v4 as uuidv4 } from 'uuid';
 import CustomDropdown from '@/components/CustomDropdown';
 
+interface ProjectFormData {
+  title: string;
+  description: string;
+  price: string;
+  city: string;
+  status: string;
+  location: string;
+  specs: string;
+  image: string;
+  gallery: string[];
+  featured: boolean;
+  badges: string[];
+  details: {
+    bhk: string;
+    landParcel: string;
+    units: string;
+    floors: string;
+    theme: string;
+    fullDescription: string[];
+  }
+}
+
 export default function ProjectsManagement() {
   const dispatch = useDispatch();
   const projects = useAppSelector((state) => state.projects.projects);
   const [isModalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [imagePreview, setImagePreview] = useState<string>('');
+  const [mainImage, setMainImage] = useState<File | null>(null);
+  const [mainImagePreview, setMainImagePreview] = useState<string>('');
+  const [galleryImages, setGalleryImages] = useState<File[]>([]);
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
+  const [formData, setFormData] = useState<ProjectFormData>({
+    title: '',
+    description: '',
+    price: '',
+    city: '',
+    status: '',
+    location: '',
+    specs: '',
+    image: '',
+    gallery: [],
+    featured: false,
+    badges: [],
+    details: {
+      bhk: '',
+      landParcel: '',
+      units: '',
+      floors: '',
+      theme: '',
+      fullDescription: []
+    }
+  });
 
   const filteredProjects = projects.filter(project =>
     project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     project.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAddEdit = (project?: Project) => {
-    if (project) {
-      setEditingProject(project);
-      setImagePreview(project.image);
-      setGalleryPreviews(project.gallery || []);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    
+    if (type === 'checkbox') {
+      const checkbox = e.target as HTMLInputElement;
+      setFormData(prev => ({
+        ...prev,
+        [name]: checkbox.checked
+      }));
     } else {
-      setEditingProject(null);
-      setImagePreview('');
-      setGalleryPreviews([]);
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
     }
-    setSelectedImages([]);
+  };
+
+  const handleEditProduct = (project: Project) => {
+    setEditingProject(project);
+    setFormData({
+      title: project.title,
+      description: project.description,
+      price: project.price,
+      city: project.city,
+      status: project.status,
+      location: project.location,
+      specs: project.specs,
+      image: project.image,
+      gallery: project.gallery || [],
+      featured: project.featured,
+      badges: project.badges || [],
+      details: {
+        bhk: project.details?.bhk || '',
+        landParcel: project.details?.landParcel || '',
+        units: project.details?.units || '',
+        floors: project.details?.floors || '',
+        theme: project.details?.theme || '',
+        fullDescription: project.details?.fullDescription || []
+      }
+    });
+    // Set existing main image preview
+    setMainImagePreview(project.image || '');
+    // Set existing gallery previews
+    setGalleryPreviews(project.gallery || []);
     setModalOpen(true);
   };
 
@@ -44,88 +121,106 @@ export default function ProjectsManagement() {
     }
   };
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setMainImage(file);
+      const preview = URL.createObjectURL(file);
+      setMainImagePreview(preview);
+      setFormData(prev => ({
+        ...prev,
+        image: preview
+      }));
+    }
+  };
+
+  const handleGalleryImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length > 0) {
-      const mainImage = files[0];
-      setSelectedImages(prev => [...prev, ...files].slice(0, 6));
+      // Limit to 6 images
+      const newFiles = files.slice(0, 6);
+      setGalleryImages(newFiles);
       
-      // Create previews for all selected images
-      const previews = files.map(file => URL.createObjectURL(file));
-      setGalleryPreviews(prev => [...prev, ...previews].slice(0, 6));
+      // Create previews for gallery images
+      const previews = newFiles.map(file => URL.createObjectURL(file));
+      setGalleryPreviews(previews);
+      setFormData(prev => ({
+        ...prev,
+        gallery: previews
+      }));
     }
   };
 
-  const removeImage = (index: number) => {
-    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+  const removeGalleryImage = (index: number) => {
+    setGalleryImages(prev => prev.filter((_, i) => i !== index));
     setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
+    setFormData(prev => ({
+      ...prev,
+      gallery: prev.gallery.filter((_, i) => i !== index)
+    }));
   };
 
-  const uploadImages = async (files: File[]): Promise<string[]> => {
-    const uploadedUrls: string[] = [];
-    
-    for (const file of files) {
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
+  const uploadImage = async (file: File): Promise<string> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
 
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
-        if (!response.ok) {
-          throw new Error('Failed to upload image');
-        }
-
-        const data = await response.json();
-        uploadedUrls.push(data.path);
-      } catch (error) {
-        console.error('Error uploading image:', error);
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
       }
-    }
 
-    return uploadedUrls;
+      const data = await response.json();
+      return data.path;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    
+  
     try {
-      // Upload all selected images
-      const uploadedUrls = await uploadImages(selectedImages);
-      
-      // Use the first uploaded image as the main image, or keep existing one
-      const mainImageUrl = uploadedUrls[0] || editingProject?.image || '/properties/default-project.jpg';
-      
-      // Combine existing gallery images with new ones
-      const existingGallery = editingProject?.gallery || [];
-      const newGallery = [...existingGallery, ...uploadedUrls].slice(0, 6);
+      // Upload main image if changed
+      let mainImageUrl = formData.image;
+      if (mainImage) {
+        mainImageUrl = await uploadImage(mainImage);
+      }
+
+      // Upload gallery images if changed
+      let galleryUrls = formData.gallery;
+      if (galleryImages.length > 0) {
+        galleryUrls = await Promise.all(galleryImages.map(file => uploadImage(file)));
+      }
 
       const projectData: Project = {
         id: editingProject?.id || uuidv4(),
-        title: formData.get('title') as string,
-        subtitle: formData.get('subtitle') as string,
-        description: formData.get('description') as string,
-        location: formData.get('location') as string,
-        city: formData.get('city') as string,
-        price: formData.get('price') as string,
-        specs: formData.get('specs') as string,
+        title: formData.title,
+        subtitle: formData.title,
+        description: formData.description,
+        location: formData.location,
+        city: formData.city,
+        price: formData.price,
+        specs: formData.specs,
         image: mainImageUrl,
-        status: formData.get('status') as string,
-        featured: formData.get('featured') === 'true',
-        badges: [], // Will be populated based on status and features
-        gallery: newGallery,
-        amenities: [],
-        features: [],
+        status: formData.status,
+        featured: formData.featured,
+        badges: formData.badges,
+        gallery: galleryUrls,
+        amenities: editingProject?.amenities || [],
+        features: editingProject?.features || [],
         details: {
-          bhk: formData.get('bhk') as string,
-          landParcel: formData.get('landParcel') as string,
-          units: formData.get('units') as string,
-          floors: formData.get('floors') as string,
-          theme: formData.get('theme') as string,
-          fullDescription: editingProject?.details?.fullDescription || []
+          bhk: formData.details.bhk,
+          landParcel: formData.details.landParcel,
+          units: formData.details.units,
+          floors: formData.details.floors,
+          theme: formData.details.theme,
+          fullDescription: formData.details.fullDescription
         }
       };
 
@@ -137,9 +232,43 @@ export default function ProjectsManagement() {
 
       setModalOpen(false);
       setEditingProject(null);
+      // Reset image states
+      setMainImage(null);
+      setMainImagePreview('');
+      setGalleryImages([]);
+      setGalleryPreviews([]);
     } catch (error) {
       console.error('Error submitting project:', error);
     }
+  };
+
+  const handleAddNew = () => {
+    setEditingProject(null);
+    setFormData({
+      title: '',
+      description: '',
+      price: '',
+      city: '',
+      status: '',
+      location: '',
+      specs: '',
+      image: '',
+      gallery: [],
+      featured: false,
+      badges: [],
+      details: {
+        bhk: '',
+        landParcel: '',
+        units: '',
+        floors: '',
+        theme: '',
+        fullDescription: []
+      }
+    });
+    setMainImagePreview('');
+    setGalleryPreviews([]);
+    setGalleryImages([]);
+    setModalOpen(true);
   };
 
   return (
@@ -153,7 +282,7 @@ export default function ProjectsManagement() {
           </p>
         </div>
         <button
-          onClick={() => handleAddEdit()}
+          onClick={handleAddNew}
           className="flex items-center px-4 py-2 text-white bg-black rounded-lg hover:bg-black/80 transition-colors duration-300"
         >
           <PlusIcon className="w-5 h-5 mr-2" />
@@ -234,8 +363,8 @@ export default function ProjectsManagement() {
                         featured: !project.featured
                       }));
                     }}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                      project.featured ? 'bg-primary' : 'bg-gray-200'
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 ${
+                      project.featured ? 'bg-black' : 'bg-gray-200'
                     }`}
                   >
                     <span
@@ -250,7 +379,7 @@ export default function ProjectsManagement() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
-                    onClick={() => handleAddEdit(project)}
+                    onClick={() => handleEditProduct(project)}
                     className="text-black hover:text-black/80 mr-3 transition-colors duration-300"
                   >
                     <PencilIcon className="w-5 h-5" />
@@ -276,7 +405,6 @@ export default function ProjectsManagement() {
               {editingProject ? 'Edit Project' : 'Add New Project'}
             </h2>
             
-            {/* Project Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div>
@@ -284,12 +412,12 @@ export default function ProjectsManagement() {
                     Title
                   </label>
                   <input
-                    name="title"
                     type="text"
                     required
+                    value={formData.title}
+                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="Project title"
-                    defaultValue={editingProject?.title}
                   />
                 </div>
                 <div>
@@ -298,59 +426,104 @@ export default function ProjectsManagement() {
                   </label>
                   <CustomDropdown
                     options={cities.map(city => ({ value: city, label: city }))}
-                    value={editingProject?.city || ''}
+                    value={formData.city}
                     onChange={(value) => {
-                      const cityInput = document.querySelector('input[name="city"]') as HTMLInputElement;
-                      if (cityInput) cityInput.value = value;
+                      setFormData(prev => ({
+                        ...prev,
+                        city: value
+                      }));
                     }}
                     placeholder="Select City"
                   />
-                  <input type="hidden" name="city" defaultValue={editingProject?.city} />
                 </div>
               </div>
 
-              {/* Add Image Input after Title and City */}
-              <div className="col-span-2 mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Project Image
+              {/* Main Project Image */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Main Project Image
                 </label>
                 <div className="space-y-4">
-                  {/* File Upload */}
                   <div className="flex items-center space-x-4">
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={handleImageChange}
+                      onChange={handleMainImageChange}
                       className="hidden"
-                      id="image-upload"
+                      id="main-image-upload"
                     />
                     <label
-                      htmlFor="image-upload"
+                      htmlFor="main-image-upload"
                       className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                     >
                       <PlusIcon className="w-5 h-5 mr-2" />
-                      Choose Image
+                      Choose Main Image
                     </label>
-                    
-                    <span className="text-sm text-gray-500">
-                      {selectedImages.length > 0 ? selectedImages[0].name : 'No file chosen'}
-                    </span>
-                    {imagePreview && (
-                      <div className="h-16 w-16 flex-shrink-0">
-                        <img
-                          src={imagePreview}
-                          alt="Project preview"
-                          className="h-full w-full object-cover rounded-lg"
-                        />
-                      </div>
-                    )}
                   </div>
 
-                  {/* Image Preview */}
+                  {/* Main Image Preview */}
+                  {mainImagePreview && (
+                    <div className="relative w-full h-48">
+                      <img
+                        src={mainImagePreview}
+                        alt="Main project image"
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Gallery Images */}
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Gallery Images (Up to 6)
+                </label>
+                <div className="space-y-4">
                   <div className="flex items-center space-x-4">
-                   
-                    
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleGalleryImageChange}
+                      className="hidden"
+                      id="gallery-images-upload"
+                    />
+                    <label
+                      htmlFor="gallery-images-upload"
+                      className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                    >
+                      <PlusIcon className="w-5 h-5 mr-2" />
+                      Choose Gallery Images
+                    </label>
+                    <span className="text-sm text-gray-500">
+                      {galleryPreviews.length > 0 ? `${galleryPreviews.length} images selected` : 'No gallery images chosen'}
+                    </span>
                   </div>
+
+                  {/* Gallery Previews */}
+                  {galleryPreviews.length > 0 && (
+                    <div className="grid grid-cols-3 gap-4">
+                      {galleryPreviews.map((preview, index) => (
+                        <div key={index} className="relative">
+                          <img
+                            src={preview}
+                            alt={`Gallery preview ${index + 1}`}
+                            className="w-full h-32 object-cover rounded-lg"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeGalleryImage(index)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -418,14 +591,15 @@ export default function ProjectsManagement() {
                   </label>
                   <CustomDropdown
                     options={projectStatus.map(status => ({ value: status, label: status }))}
-                    value={editingProject?.status || ''}
+                    value={formData.status}
                     onChange={(value) => {
-                      const statusInput = document.querySelector('input[name="status"]') as HTMLInputElement;
-                      if (statusInput) statusInput.value = value;
+                      setFormData(prev => ({
+                        ...prev,
+                        status: value
+                      }));
                     }}
                     placeholder="Select Status"
                   />
-                  <input type="hidden" name="status" defaultValue={editingProject?.status} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -541,41 +715,6 @@ export default function ProjectsManagement() {
                   name="featured"
                   defaultValue={String(editingProject?.featured || false)}
                 />
-              </div>
-
-              {/* Add the gallery images input in your form */}
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Gallery Images (Up to 6)
-                </label>
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  {galleryPreviews.map((preview, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={preview}
-                        alt={`Gallery preview ${index + 1}`}
-                        className="w-full h-32 object-cover rounded-lg"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(index)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageChange}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-                />
-                <p className="mt-2 text-sm text-gray-500">Select up to 6 images for the project gallery.</p>
               </div>
 
               <div className="flex justify-end space-x-4">
