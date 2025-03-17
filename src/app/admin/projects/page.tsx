@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { cities, projectStatus, type Project } from '@/data/projects';
@@ -17,7 +17,7 @@ interface ProjectFormData {
   status: string;
   location: string;
   specs: string;
-  image: string;
+  image: string | null;
   gallery: string[];
   featured: boolean;
   badges: string[];
@@ -49,7 +49,7 @@ export default function ProjectsManagement() {
     status: '',
     location: '',
     specs: '',
-    image: '',
+    image: null,
     gallery: [],
     featured: false,
     badges: [],
@@ -69,25 +69,30 @@ export default function ProjectsManagement() {
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
     
-    if (type === 'checkbox') {
-      const checkbox = e.target as HTMLInputElement;
-      setFormData(prev => ({
-        ...prev,
-        [name]: checkbox.checked
-      }));
+    // Handle nested details object
+    if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+      if (parent === 'details') {
+        setFormData(prev => ({
+          ...prev,
+          details: {
+            ...prev.details,
+            [child]: value
+          }
+        }));
+      }
     } else {
       setFormData(prev => ({
         ...prev,
         [name]: value
-      }));
+      } as ProjectFormData));
     }
   };
 
   const handleEditProduct = (project: Project) => {
-    setEditingProject(project);
-    setFormData({
+    const formDataToSet = {
       title: project.title,
       description: project.description,
       price: project.price,
@@ -95,7 +100,7 @@ export default function ProjectsManagement() {
       status: project.status,
       location: project.location,
       specs: project.specs,
-      image: project.image,
+      image: project.image || null,
       gallery: project.gallery || [],
       featured: project.featured,
       badges: project.badges || [],
@@ -107,7 +112,10 @@ export default function ProjectsManagement() {
         theme: project.details?.theme || '',
         fullDescription: project.details?.fullDescription || []
       }
-    });
+    };
+
+    setEditingProject(project);
+    setFormData(formDataToSet);
     // Set existing main image preview
     setMainImagePreview(project.image || '');
     // Set existing gallery previews
@@ -116,7 +124,34 @@ export default function ProjectsManagement() {
     setMainImage(null);
     setGalleryImages([]);
     setModalOpen(true);
+
+    // Save to localStorage after state is set
+    localStorage.setItem('editingProject', JSON.stringify(project));
+    localStorage.setItem('formData', JSON.stringify(formDataToSet));
   };
+
+  // Load saved data on component mount
+  useEffect(() => {
+    const savedProject = localStorage.getItem('editingProject');
+    const savedFormData = localStorage.getItem('formData');
+    
+    if (savedProject && savedFormData && isModalOpen) {
+      try {
+        const project = JSON.parse(savedProject);
+        const formData = JSON.parse(savedFormData);
+        
+        setEditingProject(project);
+        setFormData(formData);
+        setMainImagePreview(formData.image || '');
+        setGalleryPreviews(formData.gallery || []);
+      } catch (error) {
+        console.error('Error loading saved form data:', error);
+        // Clear invalid data from localStorage
+        localStorage.removeItem('editingProject');
+        localStorage.removeItem('formData');
+      }
+    }
+  }, [isModalOpen]);
 
   const handleDelete = (projectId: string) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
@@ -199,12 +234,26 @@ export default function ProjectsManagement() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+    
     try {
+      // Show loading state
+      const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+      const originalText = submitButton.innerText;
+      submitButton.disabled = true;
+      submitButton.innerText = 'Saving...';
+
       // Upload main image if changed
       let mainImageUrl = formData.image;
       if (mainImage) {
-        mainImageUrl = await uploadImage(mainImage);
+        try {
+          mainImageUrl = await uploadImage(mainImage);
+        } catch (error) {
+          console.error('Error uploading main image:', error);
+          alert('Failed to upload main image. Please try again.');
+          submitButton.disabled = false;
+          submitButton.innerText = originalText;
+          return;
+        }
       }
 
       // Handle gallery images
@@ -212,16 +261,20 @@ export default function ProjectsManagement() {
       
       // Upload new gallery images
       if (galleryImages.length > 0) {
-        const uploadedUrls = await Promise.all(galleryImages.map(file => uploadImage(file)));
-        
-        // Replace the temporary preview URLs with actual uploaded URLs
-        const previewUrls = galleryImages.map(file => URL.createObjectURL(file));
-        previewUrls.forEach((previewUrl, index) => {
-          const previewIndex = galleryUrls.indexOf(previewUrl);
-          if (previewIndex !== -1) {
-            galleryUrls[previewIndex] = uploadedUrls[index];
-          }
-        });
+        try {
+          const uploadedUrls = await Promise.all(
+            galleryImages.map(file => uploadImage(file))
+          );
+          
+          // Replace the temporary preview URLs with actual uploaded URLs
+          galleryUrls = uploadedUrls;
+        } catch (error) {
+          console.error('Error uploading gallery images:', error);
+          alert('Failed to upload gallery images. Please try again.');
+          submitButton.disabled = false;
+          submitButton.innerText = originalText;
+          return;
+        }
       }
 
       const projectData: Project = {
@@ -233,10 +286,10 @@ export default function ProjectsManagement() {
         city: formData.city,
         price: formData.price,
         specs: formData.specs,
-        image: mainImageUrl,
+        image: mainImageUrl || '',
         status: formData.status,
         featured: formData.featured,
-        badges: formData.badges,
+        badges: [formData.status], // Add status as a badge
         gallery: galleryUrls,
         amenities: editingProject?.amenities || [],
         features: editingProject?.features || [],
@@ -246,7 +299,8 @@ export default function ProjectsManagement() {
           units: formData.details.units,
           floors: formData.details.floors,
           theme: formData.details.theme,
-          fullDescription: formData.details.fullDescription
+          fullDescription: formData.details.fullDescription ? 
+            formData.details.fullDescription : []
         }
       };
 
@@ -256,8 +310,13 @@ export default function ProjectsManagement() {
         dispatch(addProject(projectData));
       }
 
+      // Clear localStorage
+      localStorage.removeItem('editingProject');
+      localStorage.removeItem('formData');
+
       setModalOpen(false);
       setEditingProject(null);
+      
       // Reset all states
       setMainImage(null);
       setMainImagePreview('');
@@ -271,7 +330,7 @@ export default function ProjectsManagement() {
         status: '',
         location: '',
         specs: '',
-        image: '',
+        image: null,
         gallery: [],
         featured: false,
         badges: [],
@@ -284,9 +343,12 @@ export default function ProjectsManagement() {
           fullDescription: []
         }
       });
+
+      // Show success message
+      alert(editingProject ? 'Project updated successfully!' : 'Project added successfully!');
     } catch (error) {
       console.error('Error submitting project:', error);
-      alert('Error updating project. Please try again.');
+      alert('Error saving project. Please try again.');
     }
   };
 
@@ -300,7 +362,7 @@ export default function ProjectsManagement() {
       status: '',
       location: '',
       specs: '',
-      image: '',
+      image: null,
       gallery: [],
       featured: false,
       badges: [],
@@ -380,11 +442,17 @@ export default function ProjectsManagement() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="h-10 w-10 flex-shrink-0">
-                      <img
-                        className="h-10 w-10 rounded-lg object-cover"
-                        src={project.image}
-                        alt={project.title}
-                      />
+                      {project.image ? (
+                        <img
+                          className="h-10 w-10 rounded-lg object-cover"
+                          src={project.image}
+                          alt={project.title}
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center">
+                          <span className="text-gray-500 text-xs">No image</span>
+                        </div>
+                      )}
                     </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">
@@ -454,6 +522,7 @@ export default function ProjectsManagement() {
             </h2>
             
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Title and City */}
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -461,9 +530,10 @@ export default function ProjectsManagement() {
                   </label>
                   <input
                     type="text"
+                    name="title"
                     required
                     value={formData.title}
-                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="Project title"
                   />
@@ -484,6 +554,166 @@ export default function ProjectsManagement() {
                     placeholder="Select City"
                   />
                 </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  required
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  rows={4}
+                  placeholder="Project description"
+                />
+              </div>
+
+              {/* Price and Location */}
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Price
+                  </label>
+                  <input
+                    name="price"
+                    type="text"
+                    required
+                    value={formData.price}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="₹0.00 Cr*"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Location
+                  </label>
+                  <input
+                    name="location"
+                    type="text"
+                    required
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="Specific location"
+                  />
+                </div>
+              </div>
+
+              {/* Status and Specifications */}
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Status
+                  </label>
+                  <CustomDropdown
+                    options={projectStatus.map(status => ({ value: status, label: status }))}
+                    value={formData.status}
+                    onChange={(value) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        status: value
+                      }));
+                    }}
+                    placeholder="Select Status"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Specifications
+                  </label>
+                  <input
+                    name="specs"
+                    type="text"
+                    required
+                    value={formData.specs}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="e.g., 3 & 4 BHK Luxury Apartments"
+                  />
+                </div>
+              </div>
+
+              {/* Project Details */}
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    BHK Types
+                  </label>
+                  <input
+                    name="details.bhk"
+                    type="text"
+                    required
+                    value={formData.details.bhk}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="e.g., 2, 3 & 4 BHK"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Land Parcel
+                  </label>
+                  <input
+                    name="details.landParcel"
+                    type="text"
+                    required
+                    value={formData.details.landParcel}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="e.g., 25 Acres"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Total Units
+                  </label>
+                  <input
+                    name="details.units"
+                    type="text"
+                    required
+                    value={formData.details.units}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="e.g., 1500+"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Floors
+                  </label>
+                  <input
+                    name="details.floors"
+                    type="text"
+                    required
+                    value={formData.details.floors}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="e.g., G + 30"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Theme
+                </label>
+                <input
+                  name="details.theme"
+                  type="text"
+                  required
+                  value={formData.details.theme}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  placeholder="e.g., Modern Living Redefined"
+                />
               </div>
 
               {/* Main Project Image */}
@@ -553,185 +783,27 @@ export default function ProjectsManagement() {
                   {galleryPreviews.length > 0 && (
                     <div className="grid grid-cols-3 gap-4">
                       {galleryPreviews.map((preview, index) => (
-                        <div key={index} className="relative">
-                          <img
-                            src={preview}
-                            alt={`Gallery preview ${index + 1}`}
-                            className="w-full h-32 object-cover rounded-lg"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeGalleryImage(index)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
+                        preview && (
+                          <div key={index} className="relative">
+                            <img
+                              src={preview}
+                              alt={`Gallery preview ${index + 1}`}
+                              className="w-full h-32 object-cover rounded-lg"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeGalleryImage(index)}
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        )
                       ))}
                     </div>
                   )}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Subtitle
-                </label>
-                <input
-                  name="subtitle"
-                  type="text"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="Project subtitle"
-                  defaultValue={editingProject?.subtitle}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <textarea
-                  name="description"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  rows={4}
-                  placeholder="Project description"
-                  defaultValue={editingProject?.description}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Price
-                  </label>
-                  <input
-                    name="price"
-                    type="text"
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    placeholder="₹0.00 Cr*"
-                    defaultValue={editingProject?.price}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Location
-                  </label>
-                  <input
-                    name="location"
-                    type="text"
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    placeholder="Specific location"
-                    defaultValue={editingProject?.location}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
-                  </label>
-                  <CustomDropdown
-                    options={projectStatus.map(status => ({ value: status, label: status }))}
-                    value={formData.status}
-                    onChange={(value) => {
-                      setFormData(prev => ({
-                        ...prev,
-                        status: value
-                      }));
-                    }}
-                    placeholder="Select Status"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Badge
-                  </label>
-                  <input
-                    name="badge"
-                    type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    placeholder="e.g., Premium Location"
-                    defaultValue={editingProject?.badges?.[1]}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Specifications
-                </label>
-                <input
-                  name="specs"
-                  type="text"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="e.g., 3 & 4 BHK Luxury Apartments"
-                  defaultValue={editingProject?.specs}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Land Parcel
-                  </label>
-                  <input
-                    name="landParcel"
-                    type="text"
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    placeholder="e.g., 25 Acres"
-                    defaultValue={editingProject?.details?.landParcel}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Total Units
-                  </label>
-                  <input
-                    name="units"
-                    type="text"
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    placeholder="e.g., 1500+"
-                    defaultValue={editingProject?.details?.units}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Floors
-                  </label>
-                  <input
-                    name="floors"
-                    type="text"
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    placeholder="e.g., G + 30"
-                    defaultValue={editingProject?.details?.floors}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Theme
-                  </label>
-                  <input
-                    name="theme"
-                    type="text"
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    placeholder="e.g., Modern Living Redefined"
-                    defaultValue={editingProject?.details?.theme}
-                  />
                 </div>
               </div>
 
@@ -743,32 +815,31 @@ export default function ProjectsManagement() {
                 <button
                   type="button"
                   onClick={() => {
-                    const form = document.querySelector('form') as HTMLFormElement;
-                    const featuredInput = form.querySelector('[name="featured"]') as HTMLInputElement;
-                    featuredInput.value = featuredInput.value === 'true' ? 'false' : 'true';
-                    featuredInput.dispatchEvent(new Event('change'));
+                    setFormData(prev => ({
+                      ...prev,
+                      featured: !prev.featured
+                    }));
                   }}
                   className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                    editingProject?.featured ? 'bg-primary' : 'bg-gray-200'
+                    formData.featured ? 'bg-primary' : 'bg-gray-200'
                   }`}
                 >
                   <span
                     className={`inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                      editingProject?.featured ? 'translate-x-5' : 'translate-x-0'
+                      formData.featured ? 'translate-x-5' : 'translate-x-0'
                     }`}
                   />
                 </button>
-                <input
-                  type="hidden"
-                  name="featured"
-                  defaultValue={String(editingProject?.featured || false)}
-                />
               </div>
 
               <div className="flex justify-end space-x-4">
                 <button
                   type="button"
-                  onClick={() => setModalOpen(false)}
+                  onClick={() => {
+                    localStorage.removeItem('editingProject');
+                    localStorage.removeItem('formData');
+                    setModalOpen(false);
+                  }}
                   className="px-4 py-2 text-black border border-black hover:bg-black/5 rounded-lg transition-colors duration-300"
                 >
                   Cancel
