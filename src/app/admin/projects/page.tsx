@@ -112,6 +112,9 @@ export default function ProjectsManagement() {
     setMainImagePreview(project.image || '');
     // Set existing gallery previews
     setGalleryPreviews(project.gallery || []);
+    // Reset file states when editing
+    setMainImage(null);
+    setGalleryImages([]);
     setModalOpen(true);
   };
 
@@ -139,25 +142,37 @@ export default function ProjectsManagement() {
     if (files.length > 0) {
       // Limit to 6 images
       const newFiles = files.slice(0, 6);
-      setGalleryImages(newFiles);
+      setGalleryImages(prev => [...prev, ...newFiles].slice(0, 6));
       
       // Create previews for gallery images
       const previews = newFiles.map(file => URL.createObjectURL(file));
-      setGalleryPreviews(previews);
+      setGalleryPreviews(prev => [...prev, ...previews].slice(0, 6));
       setFormData(prev => ({
         ...prev,
-        gallery: previews
+        gallery: [...prev.gallery, ...previews].slice(0, 6)
       }));
     }
   };
 
   const removeGalleryImage = (index: number) => {
-    setGalleryImages(prev => prev.filter((_, i) => i !== index));
-    setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
-    setFormData(prev => ({
-      ...prev,
-      gallery: prev.gallery.filter((_, i) => i !== index)
-    }));
+    const isExistingImage = !galleryImages[index];
+    
+    if (isExistingImage) {
+      // If it's an existing image, just remove from formData and preview
+      setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
+      setFormData(prev => ({
+        ...prev,
+        gallery: prev.gallery.filter((_, i) => i !== index)
+      }));
+    } else {
+      // If it's a new image, remove from all states
+      setGalleryImages(prev => prev.filter((_, i) => i !== index));
+      setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
+      setFormData(prev => ({
+        ...prev,
+        gallery: prev.gallery.filter((_, i) => i !== index)
+      }));
+    }
   };
 
   const uploadImage = async (file: File): Promise<string> => {
@@ -192,10 +207,21 @@ export default function ProjectsManagement() {
         mainImageUrl = await uploadImage(mainImage);
       }
 
-      // Upload gallery images if changed
-      let galleryUrls = formData.gallery;
+      // Handle gallery images
+      let galleryUrls = [...formData.gallery];
+      
+      // Upload new gallery images
       if (galleryImages.length > 0) {
-        galleryUrls = await Promise.all(galleryImages.map(file => uploadImage(file)));
+        const uploadedUrls = await Promise.all(galleryImages.map(file => uploadImage(file)));
+        
+        // Replace the temporary preview URLs with actual uploaded URLs
+        const previewUrls = galleryImages.map(file => URL.createObjectURL(file));
+        previewUrls.forEach((previewUrl, index) => {
+          const previewIndex = galleryUrls.indexOf(previewUrl);
+          if (previewIndex !== -1) {
+            galleryUrls[previewIndex] = uploadedUrls[index];
+          }
+        });
       }
 
       const projectData: Project = {
@@ -232,13 +258,35 @@ export default function ProjectsManagement() {
 
       setModalOpen(false);
       setEditingProject(null);
-      // Reset image states
+      // Reset all states
       setMainImage(null);
       setMainImagePreview('');
       setGalleryImages([]);
       setGalleryPreviews([]);
+      setFormData({
+        title: '',
+        description: '',
+        price: '',
+        city: '',
+        status: '',
+        location: '',
+        specs: '',
+        image: '',
+        gallery: [],
+        featured: false,
+        badges: [],
+        details: {
+          bhk: '',
+          landParcel: '',
+          units: '',
+          floors: '',
+          theme: '',
+          fullDescription: []
+        }
+      });
     } catch (error) {
       console.error('Error submitting project:', error);
+      alert('Error updating project. Please try again.');
     }
   };
 
