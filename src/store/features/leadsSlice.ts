@@ -27,6 +27,9 @@ export const leadsSlice = createSlice({
   name: 'leads',
   initialState,
   reducers: {
+    setLeads: (state, action: PayloadAction<Lead[]>) => {
+      state.leads = action.payload;
+    },
     addLead: (state, action: PayloadAction<Omit<Lead, 'id' | 'date' | 'status'>>) => {
       const newLead: Lead = {
         ...action.payload,
@@ -48,5 +51,5 @@ export const leadsSlice = createSlice({
   },
 });
 
-export const { addLead, updateLeadStatus, deleteLead } = leadsSlice.actions;
+export const { setLeads, addLead, updateLeadStatus, deleteLead } = leadsSlice.actions;
 export default leadsSlice.reducer; 

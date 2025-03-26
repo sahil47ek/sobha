@@ -30,14 +30,10 @@ export default function Contact() {
   });
 
   const redirectToWhatsApp = (data: typeof formData) => {
-    const message = `*New Contact Form Submission*%0A
-Name: ${data.name}%0A
-Email: ${data.email}%0A
-Phone: ${data.phone}%0A
-Interest: ${data.propertyInterest}%0A
-Message: ${data.message}`;
-    
-    window.open(`https://wa.me/+919999999999?text=${message}`, '_blank');
+    const phone = "919999999999"; // Your business WhatsApp number
+    const message = `*New Contact Form Submission*%0A%0A*Name:* ${data.name}%0A*Email:* ${data.email}%0A*Phone:* ${data.phone}%0A*Interest:* ${data.propertyInterest}%0A*Message:* ${data.message}`;
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -67,6 +63,9 @@ Message: ${data.message}`;
         throw new Error('Please enter a valid phone number');
       }
 
+      // Save the form data before submission
+      const submittedData = { ...formData };
+
       // Submit to admin leads API
       const response = await fetch('/api/enquiry', {
         method: 'POST',
@@ -81,38 +80,29 @@ Message: ${data.message}`;
 
       const data = await response.json();
 
-      if (!response.ok) {
+      if (response.ok && data.success) {
+        // Show success message
+        toast.success('Thank you for your interest! Our team will contact you soon.', {
+          duration: 5000,
+        });
+
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          propertyInterest: '',
+          message: ''
+        });
+
+        // Redirect to WhatsApp with the submitted data
+        redirectToWhatsApp(submittedData);
+      } else {
         throw new Error(data.error || 'Failed to submit form');
       }
 
-      // Add to Redux store
-      dispatch(addLead({
-        ...formData,
-        propertyInterest: formData.propertyInterest,
-        message: formData.message
-      }));
-
-      // Show success message
-      toast.success('Thank you for your interest! Our team will contact you soon.', {
-        duration: 5000,
-      });
-
-      // Redirect to WhatsApp
-      redirectToWhatsApp(formData);
-
-      // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        propertyInterest: '',
-        message: ''
-      });
-
-      // Optional: Scroll to top
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
     } catch (error) {
+      console.error('Error submitting form:', error);
       toast.error(error instanceof Error ? error.message : 'Something went wrong');
     } finally {
       setIsSubmitting(false);
@@ -245,31 +235,21 @@ Message: ${data.message}`;
               <div className="mt-6 md:mt-0">
                 <h2 className="text-lg md:text-2xl font-bold text-text-primary mb-4 md:mb-8">Our Offices</h2>
                 <div className="space-y-4 md:space-y-16">
-                  {offices.map((office) => (
-                    <div key={office.city} className="bg-white rounded-xl shadow-lg p-4 md:p-6 hover:shadow-xl transition-shadow">
-                      <h3 className="text-base md:text-xl font-semibold text-text-primary mb-3 md:mb-4">{office.city}</h3>
-                      <div className="space-y-2.5 md:space-y-4">
-                        <div className="flex items-start space-x-2.5 md:space-x-3">
-                          <MapPinIcon className="w-4 md:w-6 h-4 md:h-6 flex-shrink-0 mt-1 text-primary" />
-                          <p className="text-xs md:text-base text-text-secondary">{office.address}</p>
+                  {offices.map((office, index) => (
+                    <div key={index} className="bg-white rounded-xl shadow-lg p-6">
+                      <h3 className="text-lg font-semibold mb-4">{office.city}</h3>
+                      <div className="space-y-4">
+                        <div className="flex items-start gap-4">
+                          <MapPinIcon className="w-6 h-6 text-primary flex-shrink-0" />
+                          <p className="text-gray-600">{office.address}</p>
                         </div>
-                        <div className="flex items-center space-x-2.5 md:space-x-3">
-                          <PhoneIcon className="w-4 md:w-6 h-4 md:h-6 flex-shrink-0 text-primary" />
-                          <a 
-                            href={`tel:${office.phone}`} 
-                            className="text-xs md:text-base text-text-secondary hover:text-primary transition-colors"
-                          >
-                            {office.phone}
-                          </a>
+                        <div className="flex items-center gap-4">
+                          <PhoneIcon className="w-6 h-6 text-primary flex-shrink-0" />
+                          <p className="text-gray-600">{office.phone}</p>
                         </div>
-                        <div className="flex items-center space-x-2.5 md:space-x-3">
-                          <EnvelopeIcon className="w-4 md:w-6 h-4 md:h-6 flex-shrink-0 text-primary" />
-                          <a 
-                            href={`mailto:${office.email}`} 
-                            className="text-xs md:text-base text-text-secondary hover:text-primary transition-colors"
-                          >
-                            {office.email}
-                          </a>
+                        <div className="flex items-center gap-4">
+                          <EnvelopeIcon className="w-6 h-6 text-primary flex-shrink-0" />
+                          <p className="text-gray-600">{office.email}</p>
                         </div>
                       </div>
                     </div>

@@ -1,56 +1,73 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '@/store/store';
-import { updateLeadStatus, deleteLead, type Lead } from '@/store/features/leadsSlice';
+import { deleteLead, type Lead } from '@/store/features/leadsSlice';
 import { toast } from 'react-hot-toast';
-import CustomDropdown from '@/components/CustomDropdown';
+import { EyeIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { setLeads } from '@/store/features/leadsSlice';
 
 export default function LeadsManagement() {
   const dispatch = useAppDispatch();
   const leads = useAppSelector((state) => state.leads.leads);
-  const [selectedStatus, setSelectedStatus] = useState<Lead['status'] | 'all'>('all');
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleStatusChange = (leadId: string, newStatus: Lead['status']) => {
-    dispatch(updateLeadStatus({ id: leadId, status: newStatus }));
-    toast.success('Lead status updated successfully');
-  };
+  useEffect(() => {
+    fetchLeads();
+  }, []);
 
-  const handleDelete = (leadId: string) => {
-    if (window.confirm('Are you sure you want to delete this lead?')) {
-      dispatch(deleteLead(leadId));
-      toast.success('Lead deleted successfully');
+  const fetchLeads = async () => {
+    try {
+      const response = await fetch('/api/leads');
+      if (!response.ok) {
+        throw new Error('Failed to fetch leads');
+      }
+      const data = await response.json();
+      dispatch(setLeads(data));
+    } catch (error) {
+      console.error('Error fetching leads:', error);
+      toast.error('Failed to fetch leads');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const filteredLeads = leads.filter(lead => 
-    selectedStatus === 'all' ? true : lead.status === selectedStatus
-  );
-
-  const statusOptions = [
-    { value: 'all', label: 'All Leads' },
-    { value: 'new', label: 'New' },
-    { value: 'contacted', label: 'Contacted' },
-    { value: 'qualified', label: 'Qualified' },
-    { value: 'converted', label: 'Converted' },
-    { value: 'lost', label: 'Lost' }
-  ];
-
-  const leadStatusOptions = [
-    { value: 'new', label: 'New' },
-    { value: 'contacted', label: 'Contacted' },
-    { value: 'qualified', label: 'Qualified' },
-    { value: 'converted', label: 'Converted' },
-    { value: 'lost', label: 'Lost' }
-  ];
-
-  const statusColors = {
-    new: 'bg-blue-100 text-blue-800',
-    contacted: 'bg-yellow-100 text-yellow-800',
-    qualified: 'bg-green-100 text-green-800',
-    converted: 'bg-purple-100 text-purple-800',
-    lost: 'bg-red-100 text-red-800'
+  const handleView = (lead: Lead) => {
+    setSelectedLead(lead);
+    setIsViewModalOpen(true);
   };
+
+  const handleDelete = async (lead: Lead) => {
+    if (window.confirm('Are you sure you want to delete this lead?')) {
+      try {
+        const response = await fetch('/api/leads/delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(lead),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to delete lead');
+        }
+
+        dispatch(deleteLead(lead.id));
+        toast.success('Lead deleted successfully');
+      } catch (error) {
+        console.error('Error deleting lead:', error);
+        toast.error(error instanceof Error ? error.message : 'Failed to delete lead');
+      }
+    }
+  };
+
+  if (isLoading) {
+    return <div className="text-center p-4">Loading leads...</div>;
+  }
 
   return (
     <div>
@@ -59,17 +76,6 @@ export default function LeadsManagement() {
         <p className="mt-1 text-sm text-gray-500">
           Manage and track your leads from the contact form
         </p>
-      </div>
-
-      {/* Filters */}
-      <div className="mb-6 w-48">
-        <CustomDropdown
-          options={statusOptions}
-          value={selectedStatus}
-          onChange={(value) => setSelectedStatus(value as Lead['status'] | 'all')}
-          placeholder="Filter by status"
-          variant="filter"
-        />
       </div>
 
       {/* Leads Table */}
@@ -92,15 +98,12 @@ export default function LeadsManagement() {
                     Interest
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredLeads.map((lead) => (
+                {leads.map((lead) => (
                   <tr key={lead.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(lead.date).toLocaleDateString()}
@@ -115,24 +118,23 @@ export default function LeadsManagement() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {lead.propertyInterest}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="w-40">
-                        <CustomDropdown
-                          options={leadStatusOptions}
-                          value={lead.status}
-                          onChange={(value) => handleStatusChange(lead.id, value as Lead['status'])}
-                          className={statusColors[lead.status]}
-                          variant="filter"
-                        />
-                      </div>
-                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <button
-                        onClick={() => handleDelete(lead.id)}
-                        className="text-black hover:text-black/80 transition-colors duration-300"
-                      >
-                        Delete
-                      </button>
+                      <div className="flex items-center space-x-4">
+                        <button
+                          onClick={() => handleView(lead)}
+                          className="text-black hover:text-black/80 transition-colors duration-300"
+                          title="View Details"
+                        >
+                          <EyeIcon className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(lead)}
+                          className="text-black hover:text-black/80 transition-colors duration-300"
+                          title="Delete Lead"
+                        >
+                          <TrashIcon className="w-5 h-5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -141,12 +143,74 @@ export default function LeadsManagement() {
           </div>
         </div>
 
-        {filteredLeads.length === 0 && (
+        {leads.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500">No leads found</p>
           </div>
         )}
       </div>
+
+      {/* View Lead Modal */}
+      {isViewModalOpen && selectedLead && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Lead Details</h2>
+              <button
+                onClick={() => setIsViewModalOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Name</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedLead.name}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Date</label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {new Date(selectedLead.date).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Email</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedLead.email}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Phone</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedLead.phone}</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Property Interest</label>
+                <p className="mt-1 text-sm text-gray-900">{selectedLead.propertyInterest}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Message</label>
+                <p className="mt-1 text-sm text-gray-900">{selectedLead.message}</p>
+              </div>
+            </div>
+
+            <div className="mt-8 flex justify-end">
+              <button
+                onClick={() => setIsViewModalOpen(false)}
+                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-black/80 transition-colors duration-300"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

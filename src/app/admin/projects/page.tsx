@@ -31,6 +31,41 @@ interface ProjectFormData {
   }
 }
 
+// Add email sending function
+const sendProjectEmail = async (projectData: Project) => {
+  try {
+    const response = await fetch('/api/send-project-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        subject: `New Project Lead: ${projectData.title}`,
+        projectDetails: {
+          title: projectData.title,
+          description: projectData.description,
+          price: projectData.price,
+          location: projectData.location,
+          city: projectData.city,
+          status: projectData.status,
+          specs: projectData.specs,
+          details: projectData.details,
+          featured: projectData.featured ? 'Yes' : 'No'
+        }
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to send email');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error sending project email:', error);
+    throw error;
+  }
+};
+
 export default function ProjectsManagement() {
   const dispatch = useDispatch();
   const projects = useAppSelector((state) => state.projects.projects);
@@ -75,13 +110,13 @@ export default function ProjectsManagement() {
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
       if (parent === 'details') {
-        setFormData(prev => ({
-          ...prev,
+      setFormData(prev => ({
+        ...prev,
           details: {
             ...prev.details,
             [child]: value
           }
-        }));
+      }));
       }
     } else {
       setFormData(prev => ({
@@ -202,7 +237,7 @@ export default function ProjectsManagement() {
     } else {
       // If it's a new image, remove from all states
       setGalleryImages(prev => prev.filter((_, i) => i !== index));
-      setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
+    setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
       setFormData(prev => ({
         ...prev,
         gallery: prev.gallery.filter((_, i) => i !== index)
@@ -211,30 +246,30 @@ export default function ProjectsManagement() {
   };
 
   const uploadImage = async (file: File): Promise<string> => {
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
 
-      if (!response.ok) {
-        throw new Error('Failed to upload image');
-      }
+        if (!response.ok) {
+          throw new Error('Failed to upload image');
+        }
 
-      const data = await response.json();
+        const data = await response.json();
       return data.path;
-    } catch (error) {
-      console.error('Error uploading image:', error);
+      } catch (error) {
+        console.error('Error uploading image:', error);
       throw error;
     }
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+  
     try {
       // Show loading state
       const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
@@ -303,6 +338,14 @@ export default function ProjectsManagement() {
             formData.details.fullDescription : []
         }
       };
+
+      // Send email with project details
+      try {
+        await sendProjectEmail(projectData);
+      } catch (error) {
+        console.error('Error sending project email:', error);
+        // Continue with form submission even if email fails
+      }
 
       if (editingProject) {
         dispatch(updateProject(projectData));
@@ -443,11 +486,11 @@ export default function ProjectsManagement() {
                   <div className="flex items-center">
                     <div className="h-10 w-10 flex-shrink-0">
                       {project.image ? (
-                        <img
-                          className="h-10 w-10 rounded-lg object-cover"
-                          src={project.image}
-                          alt={project.title}
-                        />
+                      <img
+                        className="h-10 w-10 rounded-lg object-cover"
+                        src={project.image}
+                        alt={project.title}
+                      />
                       ) : (
                         <div className="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center">
                           <span className="text-gray-500 text-xs">No image</span>
@@ -640,20 +683,20 @@ export default function ProjectsManagement() {
 
               {/* Project Details */}
               <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                     BHK Types
-                  </label>
-                  <input
+                </label>
+                <input
                     name="details.bhk"
-                    type="text"
-                    required
+                  type="text"
+                  required
                     value={formData.details.bhk}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="e.g., 2, 3 & 4 BHK"
-                  />
-                </div>
+                />
+              </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Land Parcel
@@ -701,18 +744,18 @@ export default function ProjectsManagement() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Theme
-                </label>
-                <input
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Theme
+                  </label>
+                  <input
                   name="details.theme"
-                  type="text"
-                  required
+                    type="text"
+                    required
                   value={formData.details.theme}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="e.g., Modern Living Redefined"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="e.g., Modern Living Redefined"
                 />
               </div>
 
