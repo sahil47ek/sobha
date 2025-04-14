@@ -8,6 +8,7 @@ import { addProject, updateProject, deleteProject } from '@/store/features/proje
 import { useAppSelector } from '@/store/store';
 import { v4 as uuidv4 } from 'uuid';
 import CustomDropdown from '@/components/CustomDropdown';
+import { toast } from 'react-hot-toast';
 
 interface ProjectFormData {
   title: string;
@@ -21,6 +22,7 @@ interface ProjectFormData {
   gallery: string[];
   featured: boolean;
   badges: string[];
+  videoUrl?: string;
   details: {
     bhk: string;
     landParcel: string;
@@ -76,6 +78,8 @@ export default function ProjectsManagement() {
   const [mainImagePreview, setMainImagePreview] = useState<string>('');
   const [galleryImages, setGalleryImages] = useState<File[]>([]);
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoPreview, setVideoPreview] = useState<string>('');
   const [formData, setFormData] = useState<ProjectFormData>({
     title: '',
     description: '',
@@ -88,6 +92,7 @@ export default function ProjectsManagement() {
     gallery: [],
     featured: false,
     badges: [],
+    videoUrl: '',
     details: {
       bhk: '',
       landParcel: '',
@@ -139,6 +144,7 @@ export default function ProjectsManagement() {
       gallery: project.gallery || [],
       featured: project.featured,
       badges: project.badges || [],
+      videoUrl: project.videoUrl || '',
       details: {
         bhk: project.details?.bhk || '',
         landParcel: project.details?.landParcel || '',
@@ -158,6 +164,8 @@ export default function ProjectsManagement() {
     // Reset file states when editing
     setMainImage(null);
     setGalleryImages([]);
+    setVideoFile(null);
+    setVideoPreview('');
     setModalOpen(true);
 
     // Save to localStorage after state is set
@@ -179,6 +187,7 @@ export default function ProjectsManagement() {
         setFormData(formData);
         setMainImagePreview(formData.image || '');
         setGalleryPreviews(formData.gallery || []);
+        setVideoPreview(formData.videoUrl || '');
       } catch (error) {
         console.error('Error loading saved form data:', error);
         // Clear invalid data from localStorage
@@ -267,6 +276,54 @@ export default function ProjectsManagement() {
     }
   };
 
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Check if file is a video
+      if (!file.type.startsWith('video/')) {
+        toast.error('Please upload a valid video file');
+        return;
+      }
+      
+      // Check file size (limit to 100MB)
+      if (file.size > 100 * 1024 * 1024) {
+        toast.error('Video file size should be less than 100MB');
+        return;
+      }
+
+      setVideoFile(file);
+      const preview = URL.createObjectURL(file);
+      setVideoPreview(preview);
+      setFormData(prev => ({
+        ...prev,
+        videoUrl: preview
+      }));
+    }
+  };
+
+  const uploadVideo = async (file: File): Promise<string> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'video');
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload video');
+      }
+
+      const data = await response.json();
+      return data.path;
+    } catch (error) {
+      console.error('Error uploading video:', error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
@@ -312,6 +369,11 @@ export default function ProjectsManagement() {
         }
       }
 
+      let videoUrl = formData.videoUrl;
+      if (videoFile) {
+        videoUrl = await uploadVideo(videoFile);
+      }
+
       const projectData: Project = {
         id: editingProject?.id || uuidv4(),
         title: formData.title,
@@ -326,6 +388,7 @@ export default function ProjectsManagement() {
         featured: formData.featured,
         badges: [formData.status], // Add status as a badge
         gallery: galleryUrls,
+        videoUrl: videoUrl,
         amenities: editingProject?.amenities || [],
         features: editingProject?.features || [],
         details: {
@@ -365,6 +428,8 @@ export default function ProjectsManagement() {
       setMainImagePreview('');
       setGalleryImages([]);
       setGalleryPreviews([]);
+      setVideoFile(null);
+      setVideoPreview('');
       setFormData({
         title: '',
         description: '',
@@ -377,6 +442,7 @@ export default function ProjectsManagement() {
         gallery: [],
         featured: false,
         badges: [],
+        videoUrl: '',
         details: {
           bhk: '',
           landParcel: '',
@@ -409,6 +475,7 @@ export default function ProjectsManagement() {
       gallery: [],
       featured: false,
       badges: [],
+      videoUrl: '',
       details: {
         bhk: '',
         landParcel: '',
@@ -421,6 +488,8 @@ export default function ProjectsManagement() {
     setMainImagePreview('');
     setGalleryPreviews([]);
     setGalleryImages([]);
+    setVideoPreview('');
+    setVideoFile(null);
     setModalOpen(true);
   };
 
@@ -558,8 +627,8 @@ export default function ProjectsManagement() {
 
       {/* Add/Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <h2 className="text-2xl font-bold mb-6">
               {editingProject ? 'Edit Project' : 'Add New Project'}
             </h2>
@@ -848,6 +917,49 @@ export default function ProjectsManagement() {
                     </div>
                   )}
                 </div>
+              </div>
+
+              {/* Video Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Project Video
+                </label>
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleVideoChange}
+                    className="block w-full text-sm text-gray-500
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-full file:border-0
+                      file:text-sm file:font-semibold
+                      file:bg-black file:text-white
+                      hover:file:bg-black/80"
+                  />
+                  {videoPreview && (
+                    <div className="relative">
+                      <video
+                        src={videoPreview}
+                        className="h-20 w-36 object-cover rounded"
+                        controls
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setVideoFile(null);
+                          setVideoPreview('');
+                          setFormData(prev => ({ ...prev, videoUrl: '' }));
+                        }}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <p className="mt-1 text-sm text-gray-500">
+                  Upload a video file (MP4, WebM, etc.) up to 100MB
+                </p>
               </div>
 
               {/* Featured Toggle */}

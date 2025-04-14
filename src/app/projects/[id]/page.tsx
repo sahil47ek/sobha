@@ -88,7 +88,7 @@ export default function ProjectPage() {
       <Navbar />
       <main className="pt-16 sm:pt-20">
         {/* Hero Section */}
-        <section className="relative h-[50vh] sm:h-[60vh] bg-black">
+        <section className="relative h-[40vh] sm:h-[50vh] md:h-[60vh] bg-black">
           {project.videoUrl ? (
             <>
               <video
@@ -96,11 +96,20 @@ export default function ProjectPage() {
                 muted
                 loop
                 playsInline
-                className="absolute inset-0 w-full h-full object-cover opacity-90"
+                poster={project.image}
+                className="absolute inset-0 w-full h-full object-cover"
               >
                 <source src={project.videoUrl} type="video/mp4" />
+                {/* Fallback to image if video fails to load */}
+                <Image
+                  src={project.image}
+                  alt={project.title}
+                  fill
+                  className="object-cover"
+                  priority
+                />
               </video>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
             </>
           ) : (
             <>
@@ -108,82 +117,108 @@ export default function ProjectPage() {
                 src={project.image}
                 alt={project.title}
                 fill
-                className="object-cover opacity-90"
+                className="object-cover"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
             </>
           )}
-          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 text-white">
-            <div className="container mx-auto px-0 sm:px-6">
+
+          {/* Content Overlay */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 text-white">
+            <div className="container mx-auto">
               <div className="max-w-4xl">
-                <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+                <div className="flex flex-wrap gap-1 sm:gap-1.5 md:gap-2 mb-2 sm:mb-3 md:mb-4">
                   {projectBadges.map((badge, index) => (
                     <span
                       key={index}
-                      className="px-2 sm:px-3 py-0.5 sm:py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs sm:text-sm"
+                      className="px-2 sm:px-2.5 md:px-3 py-0.5 sm:py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs sm:text-sm"
                     >
                       {badge}
                     </span>
                   ))}
                 </div>
-                <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4">{project.title}</h1>
-                <p className="text-base sm:text-xl text-white/90 mb-1 sm:mb-2">{project.location}, {project.city}</p>
-                <p className="text-lg sm:text-2xl font-semibold">Starting from {project.price}</p>
+                <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 md:mb-4">{project.title}</h1>
+                <p className="text-sm sm:text-base md:text-xl text-white/90 mb-1 sm:mb-2">{project.location}, {project.city}</p>
+                <p className="text-base sm:text-lg md:text-2xl font-semibold">Starting from {project.price}</p>
               </div>
             </div>
           </div>
+
+          {/* Video Controls */}
+          {project.videoUrl && (
+            <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:top-8 md:right-8">
+              <button
+                onClick={(e) => {
+                  const video = document.querySelector('video');
+                  if (video) {
+                    if (video.paused) {
+                      video.play();
+                    } else {
+                      video.pause();
+                    }
+                  }
+                }}
+                className="p-2 sm:p-3 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-sm transition-all duration-300"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
+            </div>
+          )}
         </section>
 
         {/* Content Section */}
-        <section className="py-8 sm:py-12">
+        <section className="py-6 sm:py-8 md:py-12">
           <div className="container mx-auto">
-            <div className="space-y-8 sm:space-y-12 px-4 sm:px-6">
+            <div className="space-y-6 sm:space-y-8 md:space-y-12 px-4 sm:px-6">
               {/* Main Content */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                 {/* Left Column - About and Gallery */}
                 <div className="lg:col-span-2 space-y-6 sm:space-y-8">
                   {/* Description */}
                   <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-text-primary mb-3 sm:mb-4">About the Project</h2>
-                    <p className="text-sm sm:text-lg text-text-light leading-relaxed">{project.description}</p>
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-text-primary mb-2 sm:mb-3 md:mb-4">About the Project</h2>
+                    <p className="text-sm sm:text-base md:text-lg text-text-light leading-relaxed">{project.description}</p>
                   </div>
 
                   {/* Project Details */}
                   <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-text-primary mb-3 sm:mb-4">Project Details</h2>
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-text-primary mb-2 sm:mb-3 md:mb-4">Project Details</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                      <div className="bg-gray-50 p-4 sm:p-6 rounded-lg sm:rounded-xl">
+                      <div className="bg-gray-50 p-4 sm:p-5 md:p-6 rounded-lg sm:rounded-xl">
                         <h3 className="text-base sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4">Configuration</h3>
                         <div className="space-y-2 sm:space-y-3">
                           <div>
-                            <p className="text-sm sm:text-base text-text-light">BHK Types</p>
-                            <p className="text-base sm:text-lg font-medium text-text-primary">{project.details?.bhk || project.specs}</p>
+                            <p className="text-xs sm:text-sm md:text-base text-text-light">BHK Types</p>
+                            <p className="text-sm sm:text-base md:text-lg font-medium text-text-primary">{project.details?.bhk || project.specs}</p>
                           </div>
                           <div>
-                            <p className="text-sm sm:text-base text-text-light">Total Units</p>
-                            <p className="text-base sm:text-lg font-medium text-text-primary">{project.details?.units || 'Contact for details'}</p>
+                            <p className="text-xs sm:text-sm md:text-base text-text-light">Total Units</p>
+                            <p className="text-sm sm:text-base md:text-lg font-medium text-text-primary">{project.details?.units || 'Contact for details'}</p>
                           </div>
                           <div>
-                            <p className="text-sm sm:text-base text-text-light">Floors</p>
-                            <p className="text-base sm:text-lg font-medium text-text-primary">{project.details?.floors || 'Contact for details'}</p>
+                            <p className="text-xs sm:text-sm md:text-base text-text-light">Floors</p>
+                            <p className="text-sm sm:text-base md:text-lg font-medium text-text-primary">{project.details?.floors || 'Contact for details'}</p>
                           </div>
                         </div>
                       </div>
-                      <div className="bg-gray-50 p-4 sm:p-6 rounded-lg sm:rounded-xl">
+                      <div className="bg-gray-50 p-4 sm:p-5 md:p-6 rounded-lg sm:rounded-xl">
                         <h3 className="text-base sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4">Project Overview</h3>
                         <div className="space-y-2 sm:space-y-3">
                           <div>
-                            <p className="text-sm sm:text-base text-text-light">Land Parcel</p>
-                            <p className="text-base sm:text-lg font-medium text-text-primary">{project.details?.landParcel || 'Contact for details'}</p>
+                            <p className="text-xs sm:text-sm md:text-base text-text-light">Land Parcel</p>
+                            <p className="text-sm sm:text-base md:text-lg font-medium text-text-primary">{project.details?.landParcel || 'Contact for details'}</p>
                           </div>
                           <div>
-                            <p className="text-sm sm:text-base text-text-light">Theme</p>
-                            <p className="text-base sm:text-lg font-medium text-text-primary">{project.details?.theme || 'Contact for details'}</p>
+                            <p className="text-xs sm:text-sm md:text-base text-text-light">Theme</p>
+                            <p className="text-sm sm:text-base md:text-lg font-medium text-text-primary">{project.details?.theme || 'Contact for details'}</p>
                           </div>
                           <div>
-                            <p className="text-sm sm:text-base text-text-light">Status</p>
-                            <p className="text-base sm:text-lg font-medium text-text-primary">{project.status}</p>
+                            <p className="text-xs sm:text-sm md:text-base text-text-light">Status</p>
+                            <p className="text-sm sm:text-base md:text-lg font-medium text-text-primary">{project.status}</p>
                           </div>
                         </div>
                       </div>
@@ -193,8 +228,8 @@ export default function ProjectPage() {
                   {/* Gallery */}
                   {project.gallery && project.gallery.length > 0 && (
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-bold text-text-primary mb-3 sm:mb-4">Project Gallery</h2>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
+                      <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-text-primary mb-2 sm:mb-3 md:mb-4">Project Gallery</h2>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
                         {project.gallery.map((image, index) => (
                           <div
                             key={index}
@@ -218,7 +253,7 @@ export default function ProjectPage() {
 
                 {/* Right Column - Contact Form */}
                 <div className="lg:col-span-1">
-                  <div className="bg-gray-50 p-0 sm:p-8 rounded-lg sm:rounded-xl sticky top-20 sm:top-24">
+                  <div className="bg-gray-50 p-4 sm:p-6 md:p-8 rounded-lg sm:rounded-xl sticky top-20 sm:top-24">
                     <ProjectEnquiryForm projectId={project.id} projectTitle={project.title} />
                   </div>
                 </div>
@@ -226,9 +261,9 @@ export default function ProjectPage() {
 
               {/* Testimonials Section */}
               {testimonials.filter(t => t.project === project.id).length > 0 && (
-                <div className="mt-12 sm:mt-16">
-                  <div className="text-center mb-8 sm:mb-12">
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-3 sm:mb-4">
+                <div className="mt-8 sm:mt-12 md:mt-16">
+                  <div className="text-center mb-6 sm:mb-8 md:mb-12">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-2 sm:mb-3 md:mb-4">
                       What Our Residents Say
                     </h2>
                     <p className="text-sm sm:text-base md:text-lg text-text-light max-w-2xl mx-auto">
@@ -255,12 +290,12 @@ export default function ProjectPage() {
               className="absolute top-2 right-2 sm:top-4 sm:right-4 text-white hover:text-gray-300 transition-colors p-2"
               aria-label="Close gallery"
             >
-              <XMarkIcon className="h-6 w-6 sm:h-8 sm:w-8" />
+              <XMarkIcon className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />
             </button>
             <img
               src={selectedImage}
               alt={project.title}
-              className="max-h-[90vh] max-w-[90vw] object-contain"
+              className="max-h-[85vh] max-w-[85vw] sm:max-h-[90vh] sm:max-w-[90vw] object-contain"
             />
           </div>
         )}

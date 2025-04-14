@@ -135,7 +135,7 @@ export default function Contact() {
       <Navbar />
       <main className="min-h-screen bg-white">
         {/* Hero Section */}
-        <section className="relative h-[50vh] pt-20 md:pt-32 pb-8 md:pb-16">
+        <section className="relative h-[40vh] sm:h-[45vh] md:h-[50vh] pt-16 sm:pt-20 md:pt-24">
           <div className="absolute inset-0 z-0">
             <Image
               src="/images/contact/contact-banner.webp"
@@ -146,12 +146,12 @@ export default function Contact() {
             />
             <div className="absolute inset-0 bg-black/50" />
           </div>
-          <div className="container mx-auto px-4 md:px-6 relative z-10">
-            <div className="max-w-4xl mx-auto text-center mt-16 sm:mt-8">
-              <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-6">
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-4xl mx-auto text-center mt-8 sm:mt-12 md:mt-16">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-4">
                 Contact Sobha Real Estate
               </h1>
-              <p className="text-base md:text-xl text-white/90 px-4">
+              <p className="text-sm sm:text-base md:text-lg text-white/90 px-4">
                 Get in touch with our expert team to find your dream property
               </p>
             </div>
@@ -159,71 +159,71 @@ export default function Contact() {
         </section>
 
         {/* Contact Form Section */}
-        <section className="py-8 md:pt-20">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
+        <section className="py-6 sm:py-12 md:py-20">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
               {/* Contact Form */}
-              <div className="bg-white rounded-xl shadow-lg p-5 md:p-8">
-                <h2 className="text-lg md:text-2xl font-bold text-text-primary mb-4 md:mb-6">Send us a Message</h2>
-                <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+              <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-text-primary mb-4 sm:mb-6">Send us a Message</h2>
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                   <div>
-                    <label className="block text-sm md:text-base text-text-secondary mb-1.5 md:mb-2">Full Name *</label>
+                    <label className="block text-sm sm:text-base text-text-secondary mb-1.5">Full Name *</label>
                     <input
                       type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm md:text-base text-text-secondary mb-1.5 md:mb-2">Email Address *</label>
+                    <label className="block text-sm sm:text-base text-text-secondary mb-1.5">Email Address *</label>
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm md:text-base text-text-secondary mb-1.5 md:mb-2">Phone Number *</label>
+                    <label className="block text-sm sm:text-base text-text-secondary mb-1.5">Phone Number *</label>
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm md:text-base text-text-secondary mb-1.5 md:mb-2">Interested In *</label>
+                    <label className="block text-sm sm:text-base text-text-secondary mb-1.5">Interested In *</label>
                     <CustomDropdown
                       options={propertyOptions}
                       value={formData.propertyInterest}
                       onChange={(value) => setFormData(prev => ({ ...prev, propertyInterest: value }))}
                       placeholder="Select Property Type"
-                      className="w-full text-sm md:text-base"
+                      className="w-full text-sm sm:text-base"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm md:text-base text-text-secondary mb-1.5 md:mb-2">Message *</label>
+                    <label className="block text-sm sm:text-base text-text-secondary mb-1.5">Message *</label>
                     <textarea
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
                       rows={4}
-                      className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-primary/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
                       required
                     ></textarea>
                   </div>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`w-full bg-black text-white py-2.5 md:py-4 rounded-lg text-sm md:text-lg font-semibold transition-all duration-300 
+                    className={`w-full bg-black text-white py-2.5 sm:py-4 rounded-lg text-sm sm:text-lg font-semibold transition-all duration-300 
                       ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary-dark hover:text-white active:transform active:scale-[0.99]'}`}
                   >
                     {isSubmitting ? 'Sending...' : 'Send Message'}
@@ -233,23 +233,23 @@ export default function Contact() {
 
               {/* Contact Information */}
               <div className="mt-6 md:mt-0">
-                <h2 className="text-lg md:text-2xl font-bold text-text-primary mb-4 md:mb-8">Our Offices</h2>
-                <div className="space-y-4 md:space-y-16">
+                <h2 className="text-xl sm:text-2xl font-bold text-text-primary mb-4 sm:mb-6">Our Offices</h2>
+                <div className="space-y-4 sm:space-y-6">
                   {offices.map((office, index) => (
-                    <div key={index} className="bg-white rounded-xl shadow-lg p-6">
-                      <h3 className="text-lg font-semibold mb-4">{office.city}</h3>
-                      <div className="space-y-4">
-                        <div className="flex items-start gap-4">
-                          <MapPinIcon className="w-6 h-6 text-primary flex-shrink-0" />
-                          <p className="text-gray-600">{office.address}</p>
+                    <div key={index} className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+                      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">{office.city}</h3>
+                      <div className="space-y-3 sm:space-y-4">
+                        <div className="flex items-start gap-3 sm:gap-4">
+                          <MapPinIcon className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0 mt-1" />
+                          <p className="text-sm sm:text-base text-gray-600">{office.address}</p>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <PhoneIcon className="w-6 h-6 text-primary flex-shrink-0" />
-                          <p className="text-gray-600">{office.phone}</p>
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <PhoneIcon className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
+                          <p className="text-sm sm:text-base text-gray-600">{office.phone}</p>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <EnvelopeIcon className="w-6 h-6 text-primary flex-shrink-0" />
-                          <p className="text-gray-600">{office.email}</p>
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <EnvelopeIcon className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
+                          <p className="text-sm sm:text-base text-gray-600">{office.email}</p>
                         </div>
                       </div>
                     </div>
@@ -261,9 +261,9 @@ export default function Contact() {
         </section>
 
         {/* Map Section */}
-        <section className="pb-8 md:py-20 bg-secondary">
-          <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-xl md:text-3xl font-bold text-text-primary text-center mb-6 md:mb-12">
+        <section className="pb-6 sm:pb-12 md:pb-20 bg-secondary">
+          <div className="container mx-auto px-4">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-primary text-center mb-4 sm:mb-8 md:mb-12">
               Visit Our Experience Centers
             </h2>
             <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-lg">

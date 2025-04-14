@@ -69,20 +69,20 @@ export default function TestimonialsSlider({ testimonials, variant = 'light' }: 
       )}
 
       {/* Testimonials Slider */}
-      <div className={`relative overflow-hidden rounded-2xl ${bgColorClass} px-4 sm:px-8 md:px-12 py-16 sm:py-20 md:py-24 min-h-[400px] sm:min-h-[450px] md:min-h-[500px]`}>
+      <div className={`relative overflow-hidden rounded-2xl ${bgColorClass} px-4 sm:px-6 md:px-8 lg:px-12 py-12 sm:py-16 md:py-20 lg:py-24 min-h-[350px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px]`}>
         <div className="max-w-6xl mx-auto h-full">
           {testimonials.map((testimonial, index) => (
             <div
               key={testimonial.id}
-              className={`transition-opacity duration-500 absolute inset-0 px-4 sm:px-8 ${
+              className={`transition-opacity duration-500 absolute inset-0 px-4 sm:px-6 ${
                 currentSlide === index ? 'opacity-100' : 'opacity-0 pointer-events-none'
               }`}
             >
-              <div className="flex flex-col items-center justify-center h-full py-8 sm:py-12">
+              <div className="flex flex-col items-center justify-center h-full py-6 sm:py-8">
                 <div className="flex flex-col items-center">
                   {/* Quote Icon */}
                   <svg
-                    className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-primary mb-8 sm:mb-10 md:mb-12"
+                    className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 text-primary mb-6 sm:mb-8 md:mb-10"
                     fill="currentColor"
                     viewBox="0 0 32 32"
                     aria-hidden="true"
@@ -91,8 +91,8 @@ export default function TestimonialsSlider({ testimonials, variant = 'light' }: 
                   </svg>
 
                   {/* Content */}
-                  <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12 md:mb-16">
-                    <p className={`text-lg sm:text-xl md:text-2xl lg:text-3xl font-light leading-relaxed ${textColorClass}`}>
+                  <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10 md:mb-12">
+                    <p className={`text-base sm:text-lg md:text-xl lg:text-2xl font-light leading-relaxed ${textColorClass}`}>
                       "{testimonial.content}"
                     </p>
                   </div>
@@ -100,7 +100,7 @@ export default function TestimonialsSlider({ testimonials, variant = 'light' }: 
 
                 {/* Author */}
                 <div className="flex flex-col items-center mt-auto">
-                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full overflow-hidden mb-4 sm:mb-5">
+                  <div className="relative w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full overflow-hidden mb-3 sm:mb-4">
                     <Image
                       src={testimonial.image}
                       alt={testimonial.author}
@@ -112,15 +112,15 @@ export default function TestimonialsSlider({ testimonials, variant = 'light' }: 
                         onClick={() => setShowVideo(true)}
                         className="absolute inset-0 flex items-center justify-center bg-black/50 hover:bg-black/70 transition-colors group"
                       >
-                        <PlayIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all" />
+                        <PlayIcon className="w-6 h-6 sm:w-8 sm:h-8 text-white opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all" />
                       </button>
                     )}
                   </div>
                   <div className="text-center">
-                    <p className={`text-base sm:text-lg md:text-xl font-semibold ${textColorClass}`}>
+                    <p className={`text-sm sm:text-base md:text-lg font-semibold ${textColorClass}`}>
                       {testimonial.author}
                     </p>
-                    <p className={`text-sm sm:text-base mt-1 ${variant === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>
+                    <p className={`text-xs sm:text-sm md:text-base mt-1 ${variant === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>
                       {testimonial.role}
                       {testimonial.project && (
                         <>
