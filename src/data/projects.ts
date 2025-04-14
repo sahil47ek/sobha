@@ -17,6 +17,7 @@ export interface Project {
   specs: string;
   badges: string[];
   image: string;
+  videoUrl?: string;
   gallery: string[];
   amenities: string[];
   features: string[];
@@ -35,21 +36,22 @@ export interface Project {
 // Sample projects data
 export const projects: Project[] = [
   {
-    id: 'sobha-windsor',
-    title: 'Sobha Windsor',
-    subtitle: 'Luxury Living Redefined',
-    description: 'Luxury 3 & 4 BHK apartments with world-class amenities in a prime location.',
-    location: 'Whitefield',
+    id: 'sobha-neopolis',
+    title: 'Sobha Neopolis',
+    subtitle: 'Modern Urban Living',
+    description: 'Premium 2 & 3 BHK apartments with world-class amenities in a prime location.',
+    location: 'Panathur Road, Bangalore',
     city: 'bangalore',
-    price: '₹2.5 Cr*',
-    specs: '3 & 4 BHK',
-    badges: ['Luxury', 'Ready to Move'],
-    image: '/images/projects/windsor-main.jpg',
+    price: '₹1.2 Cr*',
+    specs: '2 & 3 BHK',
+    badges: ['Premium', 'Ready to Move'],
+    image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop',
+    videoUrl: '/videos/sobha-neopolis.mp4',
     gallery: [
-      '/images/projects/windsor-1.jpg',
-      '/images/projects/windsor-2.jpg',
-      '/images/projects/windsor-3.jpg',
-      '/images/projects/windsor-4.jpg',
+      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop'
     ],
     amenities: [
       'Swimming Pool',
@@ -72,165 +74,165 @@ export const projects: Project[] = [
     featured: true,
     status: 'Ready to Move',
     details: {
-      bhk: '3 & 4 BHK',
+      bhk: '2 & 3 BHK',
       landParcel: '5 Acres',
       units: '250',
       floors: 'G + 25',
-      theme: 'Modern Luxury Living',
+      theme: 'Modern Urban Living',
       fullDescription: [
-        'Experience luxury living at its finest with Sobha Windsor.',
-        'Nestled in the heart of Whitefield, these premium apartments offer unmatched comfort and elegance.',
-        'With world-class amenities and thoughtfully designed spaces, each home is a masterpiece of luxury.'
+        'Experience modern urban living at Sobha Neopolis.',
+        'Located in the heart of Bangalore\'s IT corridor.',
+        'Premium amenities and thoughtfully designed spaces for a comfortable lifestyle.'
       ]
     }
   },
   {
-    id: 'sobha-lake-gardens',
-    title: 'Sobha Lake Gardens',
-    subtitle: 'Lakeside Living Perfected',
-    description: 'Premium lakeside living with spacious 2 & 3 BHK apartments.',
-    location: 'Hebbal',
+    id: 'sobha-infinia',
+    title: 'Sobha Infinia',
+    subtitle: 'Luxury Redefined',
+    description: 'Ultra-luxury 3 & 4 BHK apartments with premium amenities and stunning views.',
+    location: 'Outer Ring Road, Bangalore',
     city: 'bangalore',
-    price: '₹1.8 Cr*',
-    specs: '2 & 3 BHK',
-    badges: ['Premium', 'Lake View'],
-    image: '/images/projects/lake-gardens-main.jpg',
+    price: '₹2.8 Cr*',
+    specs: '3 & 4 BHK',
+    badges: ['Ultra Luxury', 'Under Construction'],
+    image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop',
     gallery: [
-      '/images/projects/lake-gardens-1.jpg',
-      '/images/projects/lake-gardens-2.jpg',
-      '/images/projects/lake-gardens-3.jpg',
-      '/images/projects/lake-gardens-4.jpg',
+      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop'
     ],
     amenities: [
-      'Lake View',
       'Infinity Pool',
-      'Modern Clubhouse',
-      'Fitness Center',
-      'Yoga Deck',
-      'Party Hall',
-      'Kids Play Zone',
-      'Walking Trail'
+      'Sky Lounge',
+      'Premium Clubhouse',
+      'Spa & Salon',
+      'Multi-purpose Court',
+      'Zen Garden',
+      'Business Center',
+      'Party Hall'
     ],
     features: [
       'Italian Marble Flooring',
-      'Designer Kitchen',
-      'VRV Air Conditioning',
+      'German Kitchen',
       'Home Automation',
-      'Private Gardens',
-      'Multi-level Security'
+      'VRV Air Conditioning',
+      'Private Decks',
+      '24/7 Security'
+    ],
+    featured: true,
+    status: 'Under Construction',
+    details: {
+      bhk: '3 & 4 BHK',
+      landParcel: '8 Acres',
+      units: '180',
+      floors: 'G + 30',
+      theme: 'Luxury Living',
+      fullDescription: [
+        'Sobha Infinia represents the pinnacle of luxury living.',
+        'Stunning views of the city skyline from every apartment.',
+        'World-class amenities and unparalleled luxury in every detail.'
+      ]
+    }
+  },
+  {
+    id: 'sobha-galera',
+    title: 'Sobha Galera',
+    subtitle: 'Exclusive Villa Living',
+    description: 'Premium villas with private gardens and exclusive amenities.',
+    location: 'Sarjapur Road, Bangalore',
+    city: 'bangalore',
+    price: '₹4.5 Cr*',
+    specs: '4 BHK Villas',
+    badges: ['Premium Villas', 'Limited Edition'],
+    image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop',
+    gallery: [
+      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop'
+    ],
+    amenities: [
+      'Private Pool Option',
+      'Clubhouse',
+      'Tennis Court',
+      'Mini Theatre',
+      'Landscaped Parks',
+      'Walking Trail',
+      'BBQ Area',
+      'Kids Play Zone'
+    ],
+    features: [
+      'Private Garden',
+      'Double Height Living',
+      'Premium Finishes',
+      'Smart Home',
+      'Servant Quarter',
+      'Multiple Parking'
+    ],
+    featured: true,
+    status: 'Under Construction',
+    details: {
+      bhk: '4 BHK',
+      landParcel: '15 Acres',
+      units: '100',
+      floors: 'G + 2',
+      theme: 'Villa Living',
+      fullDescription: [
+        'Experience exclusive villa living at Sobha Galera.',
+        'Spacious villas with private gardens in a gated community.',
+        'Premium amenities and luxurious features for an elevated lifestyle.'
+      ]
+    }
+  },
+  {
+    id: 'sobha-ayana',
+    title: 'Sobha Ayana',
+    subtitle: 'Nature-inspired Living',
+    description: 'Premium apartments surrounded by nature with modern amenities.',
+    location: 'Whitefield, Bangalore',
+    city: 'bangalore',
+    price: '₹1.8 Cr*',
+    specs: '2 & 3 BHK',
+    badges: ['Premium', 'Green Living'],
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop',
+    gallery: [
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop'
+    ],
+    amenities: [
+      'Organic Garden',
+      'Yoga Deck',
+      'Meditation Zone',
+      'Swimming Pool',
+      'Nature Trail',
+      'Butterfly Garden',
+      'Fitness Center',
+      'Multi-purpose Court'
+    ],
+    features: [
+      'Large Windows',
+      'Cross Ventilation',
+      'Premium Flooring',
+      'Modular Kitchen',
+      'Sustainable Features',
+      'Energy Efficient'
     ],
     featured: true,
     status: 'Under Construction',
     details: {
       bhk: '2 & 3 BHK',
-      landParcel: '8 Acres',
-      units: '320',
+      landParcel: '10 Acres',
+      units: '300',
       floors: 'G + 20',
-      theme: 'Lakeside Luxury',
+      theme: 'Nature Living',
       fullDescription: [
-        'Sobha Lake Gardens offers a perfect blend of nature and luxury.',
-        'With stunning views of the lake and premium amenities, it\'s more than just a home.',
-        'Experience the serenity of lakeside living with the convenience of urban connectivity.'
-      ]
-    }
-  },
-  {
-    id: 'sobha-silicon-oasis',
-    title: 'Sobha Silicon Oasis',
-    subtitle: 'Smart Living for Modern Professionals',
-    description: 'Tech-integrated smart homes with 2, 3 & 4 BHK options near IT hub.',
-    location: 'Electronic City',
-    city: 'bangalore',
-    price: '₹1.2 Cr*',
-    specs: '2, 3 & 4 BHK',
-    badges: ['Smart Homes', 'Under Construction'],
-    image: '/images/projects/silicon-oasis-main.jpg',
-    gallery: [
-      '/images/projects/silicon-oasis-1.jpg',
-      '/images/projects/silicon-oasis-2.jpg',
-      '/images/projects/silicon-oasis-3.jpg',
-      '/images/projects/silicon-oasis-4.jpg',
-    ],
-    amenities: [
-      'Smart Security',
-      'Co-working Space',
-      'Rooftop Pool',
-      'Sky Lounge',
-      'Gaming Zone',
-      'Theatre',
-      'Sports Complex',
-      'EV Charging'
-    ],
-    features: [
-      'Smart Home System',
-      'Energy Efficient Design',
-      'Premium Finishes',
-      'High-speed Internet',
-      'Acoustic Insulation',
-      'Sustainable Features'
-    ],
-    featured: true,
-    status: 'Under Construction',
-    details: {
-      bhk: '2, 3 & 4 BHK',
-      landParcel: '12 Acres',
-      units: '450',
-      floors: 'G + 30',
-      theme: 'Smart Living',
-      fullDescription: [
-        'Welcome to the future of living at Sobha Silicon Oasis.',
-        'Located in the heart of Electronic City, these smart homes are designed for tech-savvy professionals.',
-        'Experience seamless integration of technology with luxury living.'
-      ]
-    }
-  },
-  {
-    id: 'sobha-royal-pavilion',
-    title: 'Sobha Royal Pavilion',
-    subtitle: 'Ultra-Luxury Redefined',
-    description: 'Ultra-luxury 4 & 5 BHK residences with royal amenities.',
-    location: 'Sarjapur Road',
-    city: 'bangalore',
-    price: '₹4.5 Cr*',
-    specs: '4 & 5 BHK',
-    badges: ['Ultra Luxury', 'Limited Edition'],
-    image: '/images/projects/royal-pavilion-main.jpg',
-    gallery: [
-      '/images/projects/royal-pavilion-1.jpg',
-      '/images/projects/royal-pavilion-2.jpg',
-      '/images/projects/royal-pavilion-3.jpg',
-      '/images/projects/royal-pavilion-4.jpg',
-    ],
-    amenities: [
-      'Temperature Controlled Pool',
-      'Helipad',
-      'Private Theatre',
-      'Wine Cellar',
-      'Spa & Salon',
-      'Concierge Service',
-      'Business Center',
-      'Banquet Hall'
-    ],
-    features: [
-      'Double Height Living',
-      'Private Elevator',
-      'Italian Kitchen',
-      'Smart Automation',
-      'Private Pool Option',
-      'Premium Security'
-    ],
-    featured: true,
-    status: 'Ready to Move',
-    details: {
-      bhk: '4 & 5 BHK',
-      landParcel: '15 Acres',
-      units: '180',
-      floors: 'G + 35',
-      theme: 'Royal Living',
-      fullDescription: [
-        'Sobha Royal Pavilion represents the pinnacle of luxury living.',
-        'These ultra-luxury residences offer unparalleled amenities and exclusivity.',
-        'Every detail is crafted to provide a truly royal living experience.'
+        'Sobha Ayana offers a perfect blend of nature and modern living.',
+        'Thoughtfully designed spaces that bring you closer to nature.',
+        'Premium amenities focused on wellness and sustainable living.'
       ]
     }
   }

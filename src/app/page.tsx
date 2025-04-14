@@ -6,29 +6,230 @@ import Navbar from "./components/Navbar";
 import VideoBanner from './components/VideoBanner';
 import HomeHeroSlider from './components/HomeHeroSlider';
 import FeaturedPropertiesSlider from './components/FeaturedPropertiesSlider';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useAppSelector } from '@/store/store';
+import { useAppDispatch } from '@/store/store';
+import { toast } from 'react-hot-toast';
+import CustomDropdown from '@/components/CustomDropdown';
+import { testimonials } from '@/data/testimonials';
+import TestimonialsSlider from './components/TestimonialsSlider';
+
+const propertyOptions = [
+  { value: 'Luxury Apartments', label: 'Luxury Apartments' },
+  { value: 'Premium Villas', label: 'Premium Villas' },
+  { value: 'Plots', label: 'Plots' },
+  { value: 'Commercial Spaces', label: 'Commercial Spaces' }
+];
 
 export default function Home() {
   const allProjects = useAppSelector((state) => state.projects.projects);
+  const dispatch = useAppDispatch();
+  const [showPopup, setShowPopup] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    propertyInterest: '',
+    message: ''
+  });
 
   const featuredProperties = useMemo(() => {
     return allProjects
       .filter(project => project.featured)
-      .slice(0, 3)
       .map(project => ({
         id: project.id,
         title: project.title,
         price: project.price,
         location: project.location,
         specs: project.specs,
-        image: project.image
+        image: project.image,
+        badges: project.badges
       }));
   }, [allProjects]);
+
+  useEffect(() => {
+    // Show popup after a short delay
+    const timer = setTimeout(() => {
+      setShowPopup(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []); // Show on initial load and refresh
+
+  const redirectToWhatsApp = (data: typeof formData) => {
+    const phone = "919999999999";
+    const message = `*New Contact Form Submission*%0A%0A*Name:* ${data.name}%0A*Email:* ${data.email}%0A*Phone:* ${data.phone}%0A*Interest:* ${data.propertyInterest}%0A*Message:* ${data.message}`;
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      if (!formData.name || !formData.email || !formData.phone || !formData.propertyInterest || !formData.message) {
+        throw new Error('Please fill in all required fields');
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      const phoneRegex = /^\d{10}$/;
+      if (!phoneRegex.test(formData.phone.replace(/[^0-9]/g, ''))) {
+        throw new Error('Please enter a valid phone number');
+      }
+
+      const submittedData = { ...formData };
+
+      const response = await fetch('/api/enquiry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          source: 'Popup Form'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        toast.success('Thank you for your interest! Our team will contact you soon.', {
+          duration: 5000,
+        });
+
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          propertyInterest: '',
+          message: ''
+        });
+
+        redirectToWhatsApp(submittedData);
+        setShowPopup(false);
+      } else {
+        throw new Error(data.error || 'Failed to submit form');
+      }
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast.error(error instanceof Error ? error.message : 'Something went wrong');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+
+      {/* Contact Form Popup */}
+      {showPopup && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowPopup(false);
+            }
+          }}
+        >
+          <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl">
+            <button
+              onClick={() => setShowPopup(false)}
+              className="absolute right-4 top-4 text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="p-6 md:p-8">
+              <h2 className="text-2xl font-bold text-text-primary mb-6">
+                Get in Touch with Sobha
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Fill out the form below and our team will get back to you shortly.
+              </p>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Interested In *</label>
+                  <CustomDropdown
+                    options={propertyOptions}
+                    value={formData.propertyInterest}
+                    onChange={(value) => setFormData(prev => ({ ...prev, propertyInterest: value }))}
+                    placeholder="Select Property Type"
+                    className="w-full text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Message *</label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+                    required
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={`w-full bg-black text-white py-3 rounded-lg text-sm font-semibold transition-all duration-300 
+                    ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary-dark hover:text-white active:transform active:scale-[0.99]'}`}
+                >
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Video Banner Section */}
       <VideoBanner />
@@ -115,8 +316,25 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="pt-12 sm:pt-20 bg-gradient-to-b from-white via-primary/5 to-white">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-3 sm:mb-4">
+              What Our Residents Say
+            </h2>
+            <p className="text-sm sm:text-base md:text-lg text-text-light max-w-2xl mx-auto">
+              Hear from our happy homeowners about their Sobha experience
+            </p>
+          </div>
+          <div className="max-w-7xl mx-auto">
+            <TestimonialsSlider testimonials={testimonials} variant="light" />
+          </div>
+        </div>
+      </section>
+
       {/* FAQ Section */}
-      <section className="py-12 sm:py-20 bg-gradient-to-b from-white via-primary/5 to-white">
+      <section className="pb-12 sm:pb-20 bg-gradient-to-b from-white via-primary/5 to-white">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-8 sm:mb-12">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-3 sm:mb-4">
@@ -208,7 +426,7 @@ export default function Home() {
                 href="/contact"
                 className="w-full sm:w-auto inline-block bg-white text-black px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold hover:scale-105 hover:shadow-lg transition-all duration-300"
               >
-                Schedule Consultation
+                Schedule a Callback
               </Link>
 
             </div>

@@ -12,6 +12,7 @@ interface Property {
   location: string;
   specs: string;
   image: string;
+  badges: string[];
 }
 
 interface FeaturedPropertiesSliderProps {
@@ -46,10 +47,11 @@ export default function FeaturedPropertiesSlider({ properties }: FeaturedPropert
       {/* Slides */}
       <div className="relative h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl overflow-hidden shadow-lg">
         {properties.map((property, index) => (
-          <div
+          <Link
             key={property.id}
-            className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${
-              currentSlide === index ? 'opacity-100' : 'opacity-0'
+            href={`/projects/${property.id}`}
+            className={`absolute inset-0 transition-opacity duration-500 ease-in-out group hover:cursor-pointer ${
+              currentSlide === index ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
           >
             {/* Background Image */}
@@ -58,7 +60,8 @@ export default function FeaturedPropertiesSlider({ properties }: FeaturedPropert
                 src={property.image}
                 alt={property.title}
                 fill
-                className="object-cover"
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                priority={index === 0}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
             </div>
@@ -69,26 +72,49 @@ export default function FeaturedPropertiesSlider({ properties }: FeaturedPropert
                 <div className="container mx-auto">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 sm:gap-0">
                     <div className="max-w-2xl">
-                      <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-4">
+                      {/* Badges */}
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {property.badges.map((badge, idx) => (
+                          <span
+                            key={idx}
+                            className="px-3 py-1 text-xs font-medium bg-primary/10 text-primary rounded-full"
+                          >
+                            {badge}
+                          </span>
+                        ))}
+                      </div>
+                      <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-4 group-hover:text-primary transition-colors">
                         {property.title}
                       </h3>
-                      <p className="text-base sm:text-lg md:text-xl text-white/90 mb-1 sm:mb-2">{property.location}</p>
-                      <p className="text-sm sm:text-base md:text-lg text-white/80">{property.specs}</p>
+                      <p className="text-base sm:text-lg md:text-xl text-white/90 mb-1 sm:mb-2">
+                        <span className="inline-block mr-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block -mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        </span>
+                        {property.location}
+                      </p>
+                      <p className="text-sm sm:text-base md:text-lg text-white/80">
+                        <span className="inline-block mr-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block -mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                        </span>
+                        {property.specs}
+                      </p>
                     </div>
                     <div className="w-full sm:w-auto text-left sm:text-right">
                       <p className="text-xl sm:text-2xl font-bold text-white mb-2 sm:mb-4">{property.price}</p>
-                      <Link
-                        href={`/projects/${property.id}`}
-                        className="inline-block w-full sm:w-auto text-center bg-white text-black px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-primary hover:text-black transition-all duration-300"
-                      >
+                      <span className="inline-block w-full sm:w-auto text-center bg-white text-black px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base font-semibold group-hover:bg-primary group-hover:text-black transition-all duration-300">
                         View Details
-                      </Link>
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 

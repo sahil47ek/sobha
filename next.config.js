@@ -14,6 +14,19 @@ const nextConfig = {
     // your project has type errors.
     ignoreBuildErrors: true,
   },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors 'self'; frame-src 'self' https://www.youtube.com https://youtube.com;"
+          }
+        ]
+      }
+    ];
+  }
 }
 
 module.exports = nextConfig 
