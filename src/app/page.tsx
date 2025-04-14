@@ -36,7 +36,6 @@ export default function Home() {
 
   const featuredProperties = useMemo(() => {
     return allProjects
-      .filter(project => project.featured)
       .map(project => ({
         id: project.id,
         title: project.title,
@@ -240,10 +239,10 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 sm:mb-12 space-y-4 sm:space-y-0">
             <div>
               <h2 className="text-2xl sm:text-4xl text-center sm:text-left font-bold text-text-primary">
-                Featured Projects
+                Our Projects
               </h2>
               <p className="text-text-light mt-2 max-w-2xl">
-                Discover our handpicked selection of premium properties in the most sought-after locations
+                Discover our collection of premium properties in the most sought-after locations
               </p>
             </div>
             <Link
