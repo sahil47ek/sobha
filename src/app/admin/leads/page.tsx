@@ -43,7 +43,7 @@ export default function LeadsManagement() {
     if (window.confirm('Are you sure you want to delete this lead?')) {
       try {
         // Show loading state
-        toast.loading('Deleting lead...');
+        const loadingToast = toast.loading('Deleting lead...');
         
         const response = await fetch('/api/leads/delete', {
           method: 'POST',
@@ -55,29 +55,30 @@ export default function LeadsManagement() {
 
         const data = await response.json();
 
+        // Dismiss loading toast
+        toast.dismiss(loadingToast);
+
         if (!response.ok) {
           throw new Error(data.error || 'Failed to delete lead');
         }
 
-        // Dismiss loading toast
-        toast.dismiss();
-        
-        // Update local state
+        if (process.env.NODE_ENV === 'production') {
+          toast.error('Lead deletion is not yet implemented in production. Please contact your administrator.');
+          return;
+        }
+
+        // Only update UI and show success in development
         dispatch(deleteLead(lead.id));
         toast.success('Lead deleted successfully');
         
         // Refresh leads list
         await fetchLeads();
       } catch (error) {
-        // Dismiss loading toast
-        toast.dismiss();
-        
         console.error('Error deleting lead:', error);
         const errorMessage = error instanceof Error ? error.message : 'Failed to delete lead';
         
         if (errorMessage.includes('Server configuration') || errorMessage.includes('Failed to delete lead from database')) {
-          toast.error('Unable to delete lead at this time. Our team has been notified.');
-          // Here you could also send an error report to your error tracking service
+          toast.error('Lead deletion is not yet implemented in production. Please contact your administrator.');
         } else {
           toast.error(errorMessage);
         }

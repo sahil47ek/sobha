@@ -40,18 +40,11 @@ export async function POST(request: Request) {
     const isProduction = process.env.NODE_ENV === 'production';
     
     if (isProduction) {
-      // In production, use MongoDB or your preferred database
-      try {
-        // For now, we'll just simulate success since the database isn't set up
-        // TODO: Implement actual database deletion here
-        return NextResponse.json({ success: true });
-      } catch (error) {
-        console.error('Database error:', error);
-        return NextResponse.json(
-          { error: 'Failed to delete lead from database' },
-          { status: 500 }
-        );
-      }
+      // Return an error in production since database deletion isn't implemented yet
+      return NextResponse.json(
+        { error: 'Lead deletion is not yet implemented in production environment' },
+        { status: 501 }
+      );
     } else {
       // In development, use file system
       const filePath = path.join(process.cwd(), 'src', 'data', 'leads.json');
