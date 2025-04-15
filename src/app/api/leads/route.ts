@@ -15,10 +15,28 @@ interface Lead {
   date: string;
 }
 
+// Helper function to get the leads file path
+const getLeadsFilePath = () => {
+  // In production (Vercel), use /tmp directory which is writable
+  const baseDir = process.env.NODE_ENV === 'production' ? '/tmp' : process.cwd();
+  return path.join(baseDir, 'leads.json');
+};
+
+// Helper function to ensure the leads file exists
+async function ensureLeadsFile() {
+  const filePath = getLeadsFilePath();
+  try {
+    await fs.promises.access(filePath);
+  } catch {
+    // File doesn't exist, create it with empty array
+    await fs.promises.writeFile(filePath, '[]');
+  }
+  return filePath;
+}
+
 export async function POST(request: Request) {
   try {
     const lead = await request.json();
-    const isProduction = process.env.NODE_ENV === 'production';
     
     // Add timestamp and ID to the lead
     const newLead = {
@@ -27,35 +45,27 @@ export async function POST(request: Request) {
       timestamp: new Date().toISOString()
     };
 
-    if (isProduction) {
-      // In production, we'll just send the email notification
-      // TODO: Add your database logic here
-      console.log('Production environment - Lead would be saved to database:', newLead);
-    } else {
-      // In development, save to file
-      const filePath = path.join(process.cwd(), 'leads.json');
-      let leads = [];
-      
-      try {
-        if (fs.existsSync(filePath)) {
-          const fileContent = fs.readFileSync(filePath, 'utf8');
-          leads = JSON.parse(fileContent);
-        }
-      } catch (error) {
-        console.error('Error reading leads file:', error);
-      }
-
-      leads.push(newLead);
-
-      try {
-        fs.writeFileSync(filePath, JSON.stringify(leads, null, 2));
-      } catch (error) {
-        console.error('Error writing to leads file:', error);
-        throw new Error('Failed to save lead');
-      }
+    // Get the leads file path and ensure it exists
+    const filePath = await ensureLeadsFile();
+    let leads = [];
+    
+    try {
+      const fileContent = await fs.promises.readFile(filePath, 'utf8');
+      leads = JSON.parse(fileContent);
+    } catch (error) {
+      console.error('Error reading leads file:', error);
     }
 
-    // Send email notification regardless of environment
+    leads.push(newLead);
+
+    try {
+      await fs.promises.writeFile(filePath, JSON.stringify(leads, null, 2));
+    } catch (error) {
+      console.error('Error writing to leads file:', error);
+      throw new Error('Failed to save lead');
+    }
+
+    // Send email notification
     try {
       await sendLeadNotificationEmail(newLead);
     } catch (error) {
@@ -78,11 +88,12 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    // Read the current leads
-    const filePath = path.join(process.cwd(), 'src', 'data', 'leads.json');
+    // Get the leads file path and ensure it exists
+    const filePath = await ensureLeadsFile();
     let leads: Lead[] = [];
+    
     try {
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      const fileContent = await fs.promises.readFile(filePath, 'utf-8');
       leads = JSON.parse(fileContent);
     } catch (error) {
       // If file doesn't exist or is empty, return empty array

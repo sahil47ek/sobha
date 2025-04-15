@@ -62,12 +62,7 @@ export default function LeadsManagement() {
           throw new Error(data.error || 'Failed to delete lead');
         }
 
-        if (process.env.NODE_ENV === 'production') {
-          toast.error('Lead deletion is not yet implemented in production. Please contact your administrator.');
-          return;
-        }
-
-        // Only update UI and show success in development
+        // Update UI and show success
         dispatch(deleteLead(lead.id));
         toast.success('Lead deleted successfully');
         
@@ -76,12 +71,7 @@ export default function LeadsManagement() {
       } catch (error) {
         console.error('Error deleting lead:', error);
         const errorMessage = error instanceof Error ? error.message : 'Failed to delete lead';
-        
-        if (errorMessage.includes('Server configuration') || errorMessage.includes('Failed to delete lead from database')) {
-          toast.error('Lead deletion is not yet implemented in production. Please contact your administrator.');
-        } else {
-          toast.error(errorMessage);
-        }
+        toast.error(errorMessage);
       }
     }
   };

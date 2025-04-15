@@ -24,6 +24,25 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Helper function to get the leads file path
+const getLeadsFilePath = () => {
+  // In production (Vercel), use /tmp directory which is writable
+  const baseDir = process.env.NODE_ENV === 'production' ? '/tmp' : process.cwd();
+  return path.join(baseDir, 'leads.json');
+};
+
+// Helper function to ensure the leads file exists
+async function ensureLeadsFile() {
+  const filePath = getLeadsFilePath();
+  try {
+    await fs.access(filePath);
+  } catch {
+    // File doesn't exist, create it with empty array
+    await fs.writeFile(filePath, '[]');
+  }
+  return filePath;
+}
+
 export async function POST(request: Request) {
   try {
     const data = await request.json();
@@ -36,53 +55,42 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if we're in production environment
-    const isProduction = process.env.NODE_ENV === 'production';
+    // Ensure leads file exists and get its path
+    const filePath = await ensureLeadsFile();
+    let leads: Lead[] = [];
     
-    if (isProduction) {
-      // Return an error in production since database deletion isn't implemented yet
+    try {
+      const fileContent = await fs.readFile(filePath, 'utf-8');
+      leads = JSON.parse(fileContent);
+    } catch (error) {
+      console.error('Error reading leads file:', error);
       return NextResponse.json(
-        { error: 'Lead deletion is not yet implemented in production environment' },
-        { status: 501 }
+        { error: 'Failed to read leads data' },
+        { status: 500 }
       );
-    } else {
-      // In development, use file system
-      const filePath = path.join(process.cwd(), 'src', 'data', 'leads.json');
-      let leads: Lead[] = [];
-      
-      try {
-        const fileContent = await fs.readFile(filePath, 'utf-8');
-        leads = JSON.parse(fileContent);
-      } catch (error) {
-        console.error('Error reading leads file:', error);
-        return NextResponse.json(
-          { error: 'Failed to read leads data' },
-          { status: 500 }
-        );
-      }
+    }
 
-      // Find the lead to be deleted
-      const leadIndex = leads.findIndex(lead => lead.id === id);
-      
-      if (leadIndex === -1) {
-        return NextResponse.json(
-          { error: 'Lead not found' },
-          { status: 404 }
-        );
-      }
+    // Find the lead to be deleted
+    const leadIndex = leads.findIndex(lead => lead.id === id);
+    
+    if (leadIndex === -1) {
+      return NextResponse.json(
+        { error: 'Lead not found' },
+        { status: 404 }
+      );
+    }
 
-      // Remove the lead
-      leads.splice(leadIndex, 1);
+    // Remove the lead
+    leads.splice(leadIndex, 1);
 
-      try {
-        await fs.writeFile(filePath, JSON.stringify(leads, null, 2));
-      } catch (error) {
-        console.error('Error writing leads file:', error);
-        return NextResponse.json(
-          { error: 'Failed to update leads data' },
-          { status: 500 }
-        );
-      }
+    try {
+      await fs.writeFile(filePath, JSON.stringify(leads, null, 2));
+    } catch (error) {
+      console.error('Error writing leads file:', error);
+      return NextResponse.json(
+        { error: 'Failed to update leads data' },
+        { status: 500 }
+      );
     }
 
     // Send notification email
