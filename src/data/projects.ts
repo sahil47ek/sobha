@@ -16,9 +16,6 @@ export interface Project {
   price: string;
   specs: string;
   badges: string[];
-  image: string;
-  videoUrl?: string;
-  gallery: string[];
   amenities: string[];
   features: string[];
   featured: boolean;
@@ -45,14 +42,6 @@ export const projects: Project[] = [
     price: '₹1.2 Cr*',
     specs: '2 & 3 BHK',
     badges: ['Premium', 'Ready to Move'],
-    image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop',
-    videoUrl: '/videos/sobha-neopolis.mp4',
-    gallery: [
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop'
-    ],
     amenities: [
       'Swimming Pool',
       'Clubhouse',
@@ -96,13 +85,6 @@ export const projects: Project[] = [
     price: '₹2.8 Cr*',
     specs: '3 & 4 BHK',
     badges: ['Ultra Luxury', 'Under Construction'],
-    image: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop',
-    gallery: [
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop'
-    ],
     amenities: [
       'Infinity Pool',
       'Sky Lounge',
@@ -146,13 +128,6 @@ export const projects: Project[] = [
     price: '₹4.5 Cr*',
     specs: '4 BHK Villas',
     badges: ['Premium Villas', 'Limited Edition'],
-    image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop',
-    gallery: [
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop'
-    ],
     amenities: [
       'Private Pool Option',
       'Clubhouse',
@@ -196,13 +171,6 @@ export const projects: Project[] = [
     price: '₹1.8 Cr*',
     specs: '2 & 3 BHK',
     badges: ['Premium', 'Green Living'],
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop',
-    gallery: [
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop'
-    ],
     amenities: [
       'Organic Garden',
       'Yoga Deck',
@@ -233,6 +201,54 @@ export const projects: Project[] = [
         'Sobha Ayana offers a perfect blend of nature and modern living.',
         'Thoughtfully designed spaces that bring you closer to nature.',
         'Premium amenities focused on wellness and sustainable living.'
+      ]
+    }
+  },
+  {
+    id: 'sobha-crystal-meadows',
+    title: 'Sobha Crystal Meadows',
+    subtitle: 'Luxury Living in Nature',
+    description: 'Premium 3 & 4 BHK apartments with world-class amenities surrounded by lush greenery.',
+    location: 'Whitefield Extension, Bangalore',
+    city: 'bangalore',
+    price: '₹1.8 Cr*',
+    specs: '3 & 4 BHK',
+    badges: ['Premium', 'Under Construction', 'Green Living'],
+    amenities: [
+      'Swimming Pool',
+      'Clubhouse',
+      'Gym',
+      'Children\'s Play Area',
+      'Indoor Games',
+      'Landscaped Gardens',
+      'Jogging Track',
+      'Tennis Court',
+      'Yoga Deck',
+      'Meditation Zone'
+    ],
+    features: [
+      'Premium Flooring',
+      'Modular Kitchen',
+      'High-end Fixtures',
+      'Smart Home Features',
+      'Spacious Balconies',
+      'Ample Parking',
+      'Large Windows',
+      'Cross Ventilation'
+    ],
+    featured: true,
+    status: 'Under Construction',
+    details: {
+      bhk: '3 & 4 BHK',
+      landParcel: '12 Acres',
+      units: '450',
+      floors: 'G + 25',
+      theme: 'Nature-inspired Luxury Living',
+      fullDescription: [
+        'Welcome to Sobha Crystal Meadows, where luxury meets nature.',
+        'Located in the prime area of Whitefield Extension, Bangalore.',
+        'Premium amenities and thoughtfully designed spaces for an elevated lifestyle.',
+        'Surrounded by lush greenery and offering stunning views.'
       ]
     }
   }

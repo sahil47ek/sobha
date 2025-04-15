@@ -3,7 +3,7 @@
 import { useState, FormEvent, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { cities, projectStatus, type Project } from '@/data/projects';
+import { cities, projectStatus, type Project, City, ProjectStatus } from '@/data/projects';
 import { addProject, updateProject, deleteProject } from '@/store/features/projectsSlice';
 import { useAppSelector } from '@/store/store';
 import { v4 as uuidv4 } from 'uuid';
@@ -11,18 +11,19 @@ import CustomDropdown from '@/components/CustomDropdown';
 import { toast } from 'react-hot-toast';
 
 interface ProjectFormData {
+  id: string;
   title: string;
+  subtitle: string;
   description: string;
-  price: string;
-  city: string;
-  status: string;
   location: string;
+  city: City;
+  price: string;
   specs: string;
-  image: string | null;
-  gallery: string[];
-  featured: boolean;
   badges: string[];
-  videoUrl?: string;
+  amenities: string[];
+  features: string[];
+  featured: boolean;
+  status: ProjectStatus;
   details: {
     bhk: string;
     landParcel: string;
@@ -30,7 +31,7 @@ interface ProjectFormData {
     floors: string;
     theme: string;
     fullDescription: string[];
-  }
+  };
 }
 
 // Add email sending function
@@ -74,25 +75,20 @@ export default function ProjectsManagement() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [mainImage, setMainImage] = useState<File | null>(null);
-  const [mainImagePreview, setMainImagePreview] = useState<string>('');
-  const [galleryImages, setGalleryImages] = useState<File[]>([]);
-  const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
-  const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [videoPreview, setVideoPreview] = useState<string>('');
   const [formData, setFormData] = useState<ProjectFormData>({
+    id: '',
     title: '',
+    subtitle: '',
     description: '',
     price: '',
-    city: '',
-    status: '',
+    city: cities[0],
+    status: projectStatus[0],
     location: '',
     specs: '',
-    image: null,
-    gallery: [],
     featured: false,
     badges: [],
-    videoUrl: '',
+    amenities: [],
+    features: [],
     details: {
       bhk: '',
       landParcel: '',
@@ -132,45 +128,50 @@ export default function ProjectsManagement() {
   };
 
   const handleEditProduct = (project: Project) => {
-    const formDataToSet = {
+    const formDataToSet: ProjectFormData = {
+      id: project.id,
       title: project.title,
+      subtitle: project.subtitle || '',
       description: project.description,
       price: project.price,
-      city: project.city,
-      status: project.status,
+      city: project.city as City,
+      status: project.status as ProjectStatus,
       location: project.location,
       specs: project.specs,
-      image: project.image || null,
-      gallery: project.gallery || [],
       featured: project.featured,
       badges: project.badges || [],
-      videoUrl: project.videoUrl || '',
+      amenities: project.amenities || [],
+      features: project.features || [],
       details: {
         bhk: project.details?.bhk || '',
         landParcel: project.details?.landParcel || '',
         units: project.details?.units || '',
         floors: project.details?.floors || '',
         theme: project.details?.theme || '',
-        fullDescription: project.details?.fullDescription || []
-      }
+        fullDescription: project.details?.fullDescription || [],
+      },
     };
-
-    setEditingProject(project);
     setFormData(formDataToSet);
-    // Set existing main image preview
-    setMainImagePreview(project.image || '');
-    // Set existing gallery previews
-    setGalleryPreviews(project.gallery || []);
-    // Reset file states when editing
-    setMainImage(null);
-    setGalleryImages([]);
-    setVideoFile(null);
-    setVideoPreview('');
+    setEditingProject(project);
     setModalOpen(true);
 
     // Save to localStorage after state is set
     localStorage.setItem('editingProject', JSON.stringify(project));
     localStorage.setItem('formData', JSON.stringify(formDataToSet));
+  };
+
+  const handleCityChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      city: value as City
+    }));
+  };
+
+  const handleStatusChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      status: value as ProjectStatus
+    }));
   };
 
   // Load saved data on component mount
@@ -185,9 +186,6 @@ export default function ProjectsManagement() {
         
         setEditingProject(project);
         setFormData(formData);
-        setMainImagePreview(formData.image || '');
-        setGalleryPreviews(formData.gallery || []);
-        setVideoPreview(formData.videoUrl || '');
       } catch (error) {
         console.error('Error loading saved form data:', error);
         // Clear invalid data from localStorage
@@ -203,127 +201,6 @@ export default function ProjectsManagement() {
     }
   };
 
-  const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setMainImage(file);
-      const preview = URL.createObjectURL(file);
-      setMainImagePreview(preview);
-      setFormData(prev => ({
-        ...prev,
-        image: preview
-      }));
-    }
-  };
-
-  const handleGalleryImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
-      // Limit to 6 images
-      const newFiles = files.slice(0, 6);
-      setGalleryImages(prev => [...prev, ...newFiles].slice(0, 6));
-      
-      // Create previews for gallery images
-      const previews = newFiles.map(file => URL.createObjectURL(file));
-      setGalleryPreviews(prev => [...prev, ...previews].slice(0, 6));
-      setFormData(prev => ({
-        ...prev,
-        gallery: [...prev.gallery, ...previews].slice(0, 6)
-      }));
-    }
-  };
-
-  const removeGalleryImage = (index: number) => {
-    const isExistingImage = !galleryImages[index];
-    
-    if (isExistingImage) {
-      // If it's an existing image, just remove from formData and preview
-      setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
-      setFormData(prev => ({
-        ...prev,
-        gallery: prev.gallery.filter((_, i) => i !== index)
-      }));
-    } else {
-      // If it's a new image, remove from all states
-      setGalleryImages(prev => prev.filter((_, i) => i !== index));
-    setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
-      setFormData(prev => ({
-        ...prev,
-        gallery: prev.gallery.filter((_, i) => i !== index)
-      }));
-    }
-  };
-
-  const uploadImage = async (file: File): Promise<string> => {
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to upload image');
-        }
-
-        const data = await response.json();
-      return data.path;
-      } catch (error) {
-        console.error('Error uploading image:', error);
-      throw error;
-    }
-  };
-
-  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Check if file is a video
-      if (!file.type.startsWith('video/')) {
-        toast.error('Please upload a valid video file');
-        return;
-      }
-      
-      // Check file size (limit to 100MB)
-      if (file.size > 100 * 1024 * 1024) {
-        toast.error('Video file size should be less than 100MB');
-        return;
-      }
-
-      setVideoFile(file);
-      const preview = URL.createObjectURL(file);
-      setVideoPreview(preview);
-      setFormData(prev => ({
-        ...prev,
-        videoUrl: preview
-      }));
-    }
-  };
-
-  const uploadVideo = async (file: File): Promise<string> => {
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('type', 'video');
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to upload video');
-      }
-
-      const data = await response.json();
-      return data.path;
-    } catch (error) {
-      console.error('Error uploading video:', error);
-      throw error;
-    }
-  };
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
@@ -334,63 +211,20 @@ export default function ProjectsManagement() {
       submitButton.disabled = true;
       submitButton.innerText = 'Saving...';
 
-      // Upload main image if changed
-      let mainImageUrl = formData.image;
-      if (mainImage) {
-        try {
-          mainImageUrl = await uploadImage(mainImage);
-        } catch (error) {
-          console.error('Error uploading main image:', error);
-          alert('Failed to upload main image. Please try again.');
-          submitButton.disabled = false;
-          submitButton.innerText = originalText;
-          return;
-        }
-      }
-
-      // Handle gallery images
-      let galleryUrls = [...formData.gallery];
-      
-      // Upload new gallery images
-      if (galleryImages.length > 0) {
-        try {
-          const uploadedUrls = await Promise.all(
-            galleryImages.map(file => uploadImage(file))
-          );
-          
-          // Replace the temporary preview URLs with actual uploaded URLs
-          galleryUrls = uploadedUrls;
-        } catch (error) {
-          console.error('Error uploading gallery images:', error);
-          alert('Failed to upload gallery images. Please try again.');
-          submitButton.disabled = false;
-          submitButton.innerText = originalText;
-          return;
-        }
-      }
-
-      let videoUrl = formData.videoUrl;
-      if (videoFile) {
-        videoUrl = await uploadVideo(videoFile);
-      }
-
-      const projectData: Project = {
+      const projectData = {
         id: editingProject?.id || uuidv4(),
         title: formData.title,
-        subtitle: formData.title,
+        subtitle: formData.subtitle,
         description: formData.description,
         location: formData.location,
         city: formData.city,
         price: formData.price,
         specs: formData.specs,
-        image: mainImageUrl || '',
         status: formData.status,
         featured: formData.featured,
         badges: [formData.status], // Add status as a badge
-        gallery: galleryUrls,
-        videoUrl: videoUrl,
-        amenities: editingProject?.amenities || [],
-        features: editingProject?.features || [],
+        amenities: formData.amenities,
+        features: formData.features,
         details: {
           bhk: formData.details.bhk,
           landParcel: formData.details.landParcel,
@@ -423,26 +257,21 @@ export default function ProjectsManagement() {
       setModalOpen(false);
       setEditingProject(null);
       
-      // Reset all states
-      setMainImage(null);
-      setMainImagePreview('');
-      setGalleryImages([]);
-      setGalleryPreviews([]);
-      setVideoFile(null);
-      setVideoPreview('');
+      // Reset form
       setFormData({
+        id: '',
         title: '',
+        subtitle: '',
         description: '',
         price: '',
-        city: '',
-        status: '',
+        city: cities[0],
+        status: projectStatus[0],
         location: '',
         specs: '',
-        image: null,
-        gallery: [],
         featured: false,
         badges: [],
-        videoUrl: '',
+        amenities: [],
+        features: [],
         details: {
           bhk: '',
           landParcel: '',
@@ -464,18 +293,19 @@ export default function ProjectsManagement() {
   const handleAddNew = () => {
     setEditingProject(null);
     setFormData({
+      id: '',
       title: '',
+      subtitle: '',
       description: '',
       price: '',
-      city: '',
-      status: '',
+      city: cities[0],
+      status: projectStatus[0],
       location: '',
       specs: '',
-      image: null,
-      gallery: [],
       featured: false,
       badges: [],
-      videoUrl: '',
+      amenities: [],
+      features: [],
       details: {
         bhk: '',
         landParcel: '',
@@ -485,11 +315,6 @@ export default function ProjectsManagement() {
         fullDescription: []
       }
     });
-    setMainImagePreview('');
-    setGalleryPreviews([]);
-    setGalleryImages([]);
-    setVideoPreview('');
-    setVideoFile(null);
     setModalOpen(true);
   };
 
@@ -554,17 +379,9 @@ export default function ProjectsManagement() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="h-10 w-10 flex-shrink-0">
-                      {project.image ? (
-                      <img
-                        className="h-10 w-10 rounded-lg object-cover"
-                        src={project.image}
-                        alt={project.title}
-                      />
-                      ) : (
-                        <div className="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center">
-                          <span className="text-gray-500 text-xs">No image</span>
-                        </div>
-                      )}
+                      <div className="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-500 text-xs">Project</span>
+                      </div>
                     </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">
@@ -657,12 +474,7 @@ export default function ProjectsManagement() {
                   <CustomDropdown
                     options={cities.map(city => ({ value: city, label: city }))}
                     value={formData.city}
-                    onChange={(value) => {
-                      setFormData(prev => ({
-                        ...prev,
-                        city: value
-                      }));
-                    }}
+                    onChange={handleCityChange}
                     placeholder="Select City"
                   />
                 </div>
@@ -725,12 +537,7 @@ export default function ProjectsManagement() {
                   <CustomDropdown
                     options={projectStatus.map(status => ({ value: status, label: status }))}
                     value={formData.status}
-                    onChange={(value) => {
-                      setFormData(prev => ({
-                        ...prev,
-                        status: value
-                      }));
-                    }}
+                    onChange={handleStatusChange}
                     placeholder="Select Status"
                   />
                 </div>
@@ -752,20 +559,20 @@ export default function ProjectsManagement() {
 
               {/* Project Details */}
               <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     BHK Types
-                </label>
-                <input
+                  </label>
+                  <input
                     name="details.bhk"
-                  type="text"
-                  required
+                    type="text"
+                    required
                     value={formData.details.bhk}
                     onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="e.g., 2, 3 & 4 BHK"
-                />
-              </div>
+                  />
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Land Parcel
@@ -813,153 +620,19 @@ export default function ProjectsManagement() {
                 </div>
               </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Theme
-                  </label>
-                  <input
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Theme
+                </label>
+                <input
                   name="details.theme"
-                    type="text"
-                    required
+                  type="text"
+                  required
                   value={formData.details.theme}
                   onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    placeholder="e.g., Modern Living Redefined"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  placeholder="e.g., Modern Living Redefined"
                 />
-              </div>
-
-              {/* Main Project Image */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Main Project Image
-                </label>
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleMainImageChange}
-                      className="hidden"
-                      id="main-image-upload"
-                    />
-                    <label
-                      htmlFor="main-image-upload"
-                      className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-                    >
-                      <PlusIcon className="w-5 h-5 mr-2" />
-                      Choose Main Image
-                    </label>
-                  </div>
-
-                  {/* Main Image Preview */}
-                  {mainImagePreview && (
-                    <div className="relative w-full h-48">
-                      <img
-                        src={mainImagePreview}
-                        alt="Main project image"
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Gallery Images */}
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Gallery Images (Up to 6)
-                </label>
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleGalleryImageChange}
-                      className="hidden"
-                      id="gallery-images-upload"
-                    />
-                    <label
-                      htmlFor="gallery-images-upload"
-                      className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-                    >
-                      <PlusIcon className="w-5 h-5 mr-2" />
-                      Choose Gallery Images
-                    </label>
-                    <span className="text-sm text-gray-500">
-                      {galleryPreviews.length > 0 ? `${galleryPreviews.length} images selected` : 'No gallery images chosen'}
-                    </span>
-                  </div>
-
-                  {/* Gallery Previews */}
-                  {galleryPreviews.length > 0 && (
-                    <div className="grid grid-cols-3 gap-4">
-                      {galleryPreviews.map((preview, index) => (
-                        preview && (
-                          <div key={index} className="relative">
-                            <img
-                              src={preview}
-                              alt={`Gallery preview ${index + 1}`}
-                              className="w-full h-32 object-cover rounded-lg"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeGalleryImage(index)}
-                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            </button>
-                          </div>
-                        )
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Video Upload */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Project Video
-                </label>
-                <div className="flex items-center space-x-4">
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={handleVideoChange}
-                    className="block w-full text-sm text-gray-500
-                      file:mr-4 file:py-2 file:px-4
-                      file:rounded-full file:border-0
-                      file:text-sm file:font-semibold
-                      file:bg-black file:text-white
-                      hover:file:bg-black/80"
-                  />
-                  {videoPreview && (
-                    <div className="relative">
-                      <video
-                        src={videoPreview}
-                        className="h-20 w-36 object-cover rounded"
-                        controls
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setVideoFile(null);
-                          setVideoPreview('');
-                          setFormData(prev => ({ ...prev, videoUrl: '' }));
-                        }}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                      >
-                        <TrashIcon className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-                <p className="mt-1 text-sm text-gray-500">
-                  Upload a video file (MP4, WebM, etc.) up to 100MB
-                </p>
               </div>
 
               {/* Featured Toggle */}

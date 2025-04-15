@@ -18,6 +18,9 @@ export const projectsSlice = createSlice({
   name: 'projects',
   initialState,
   reducers: {
+    resetProjects: (state) => {
+      state.projects = initialProjects;
+    },
     addProject: (state, action: PayloadAction<Project>) => {
       // Ensure ID is a string
       const newProject = {
@@ -49,5 +52,5 @@ export const projectsSlice = createSlice({
   },
 });
 
-export const { addProject, updateProject, deleteProject, setProjects } = projectsSlice.actions;
+export const { addProject, updateProject, deleteProject, setProjects, resetProjects } = projectsSlice.actions;
 export default projectsSlice.reducer; 

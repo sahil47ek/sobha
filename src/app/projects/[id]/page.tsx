@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { Project } from '@/data/projects';
+import { projectMedia } from '@/data/projectMedia';
 import ProjectEnquiryForm from '@/components/ProjectEnquiryForm';
 import { useAppSelector } from '@/store/store';
 import Navbar from '@/app/components/Navbar';
@@ -32,8 +33,11 @@ export default function ProjectPage() {
 
       if (foundProject) {
         setProject(foundProject);
-        // Set the initial selected image to the main project image
-        setSelectedImage(foundProject.image || foundProject.gallery?.[0] || '');
+        // Set the initial selected image to the main project image from static media
+        const media = projectMedia[foundProject.id];
+        if (media) {
+          setSelectedImage(media.mainImage || media.gallery?.[0] || '');
+        }
       }
     }
   }, [projectId, projects, params]);
@@ -77,8 +81,32 @@ export default function ProjectPage() {
     );
   }
 
+  // Get static media data
+  const media = projectMedia[project.id];
+  if (!media) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-text-primary mb-4">Media Not Found</h1>
+            <p className="text-text-light">The media for this project is not available.</p>
+            <div className="mt-6">
+              <button
+                onClick={() => router.push('/projects')}
+                className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+              >
+                Back to Projects
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   // Ensure all required arrays exist with fallbacks
-  const projectGallery = project.gallery || [];
+  const projectGallery = media.gallery || [];
   const projectBadges = project.badges || [];
   const projectFeatures = project.features || [];
   const projectAmenities = project.amenities || [];
@@ -89,20 +117,20 @@ export default function ProjectPage() {
       <main className="pt-16 sm:pt-20">
         {/* Hero Section */}
         <section className="relative h-[40vh] sm:h-[50vh] md:h-[60vh] bg-black">
-          {project.videoUrl ? (
+          {media.videoUrl ? (
             <>
               <video
                 autoPlay
                 muted
                 loop
                 playsInline
-                poster={project.image}
+                poster={media.mainImage}
                 className="absolute inset-0 w-full h-full object-cover"
               >
-                <source src={project.videoUrl} type="video/mp4" />
+                <source src={media.videoUrl} type="video/mp4" />
                 {/* Fallback to image if video fails to load */}
                 <Image
-                  src={project.image}
+                  src={media.mainImage}
                   alt={project.title}
                   fill
                   className="object-cover"
@@ -114,7 +142,7 @@ export default function ProjectPage() {
           ) : (
             <>
               <Image
-                src={project.image}
+                src={media.mainImage}
                 alt={project.title}
                 fill
                 className="object-cover"
@@ -146,7 +174,7 @@ export default function ProjectPage() {
           </div>
 
           {/* Video Controls */}
-          {project.videoUrl && (
+          {media.videoUrl && (
             <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:top-8 md:right-8">
               <button
                 onClick={(e) => {
@@ -226,29 +254,30 @@ export default function ProjectPage() {
                   </div>
 
                   {/* Gallery */}
-                  {project.gallery && project.gallery.length > 0 && (
-                    <div>
-                      <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-text-primary mb-2 sm:mb-3 md:mb-4">Project Gallery</h2>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
-                        {project.gallery.map((image, index) => (
-                          <div
-                            key={index}
-                            className="relative aspect-[4/3] cursor-pointer overflow-hidden rounded-lg sm:rounded-xl"
-                            onClick={() => {
-                              setSelectedImage(image);
-                              setGalleryOpen(true);
-                            }}
-                          >
-                            <img
-                              src={image}
-                              alt={`${project.title} - Gallery Image ${index + 1}`}
-                              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 hover:scale-110"
-                            />
-                          </div>
-                        ))}
-                      </div>
+                  <div>
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-text-primary mb-4 sm:mb-6">Project Gallery</h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      {media.gallery.map((image, index) => (
+                        <div
+                          key={index}
+                          className="relative aspect-[4/3] cursor-pointer overflow-hidden rounded-xl group"
+                          onClick={() => {
+                            setSelectedImage(image);
+                            setGalleryOpen(true);
+                          }}
+                        >
+                          <Image
+                            src={image}
+                            alt={`${project.title} - Gallery Image ${index + 1}`}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                          />
+                          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        </div>
+                      ))}
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 {/* Right Column - Contact Form */}
@@ -284,19 +313,44 @@ export default function ProjectPage() {
 
         {/* Image Gallery Modal */}
         {galleryOpen && selectedImage && (
-          <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4">
             <button
               onClick={() => setGalleryOpen(false)}
-              className="absolute top-2 right-2 sm:top-4 sm:right-4 text-white hover:text-gray-300 transition-colors p-2"
+              className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors p-2"
               aria-label="Close gallery"
             >
-              <XMarkIcon className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />
+              <XMarkIcon className="h-8 w-8" />
             </button>
-            <img
-              src={selectedImage}
-              alt={project.title}
-              className="max-h-[85vh] max-w-[85vw] sm:max-h-[90vh] sm:max-w-[90vw] object-contain"
-            />
+            
+            <div className="relative w-full max-w-6xl">
+              <Image
+                src={selectedImage}
+                alt={project.title}
+                width={1200}
+                height={800}
+                className="w-full h-auto max-h-[85vh] object-contain rounded-lg"
+              />
+              
+              {/* Navigation Thumbnails */}
+              <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 flex gap-2 overflow-x-auto max-w-full p-2">
+                {media.gallery.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(image)}
+                    className={`relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 ${
+                      selectedImage === image ? 'ring-2 ring-white' : 'opacity-50 hover:opacity-100'
+                    }`}
+                  >
+                    <Image
+                      src={image}
+                      alt={`Thumbnail ${index + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </main>
