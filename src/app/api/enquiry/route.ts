@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
+import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs';
 import path from 'path';
 import nodemailer from 'nodemailer';
 
@@ -8,10 +9,13 @@ interface Lead {
   name: string;
   email: string;
   phone: string;
-  propertyInterest: string;
-  message: string;
+  propertyInterest?: string;
+  projectId?: string;
+  projectTitle?: string;
+  message?: string;
+  source: string;
   date: string;
-  status: 'new' | 'contacted' | 'qualified' | 'converted' | 'lost';
+  status: string;
 }
 
 // Configure email transporter
@@ -23,13 +27,31 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Helper function to get the leads file path
+const getLeadsFilePath = () => {
+  // In production (Vercel), use /tmp directory which is writable
+  const baseDir = process.env.NODE_ENV === 'production' ? '/tmp' : process.cwd();
+  return path.join(baseDir, 'leads.json');
+};
+
+// Helper function to ensure the leads file exists
+async function ensureLeadsFile() {
+  const filePath = getLeadsFilePath();
+  try {
+    await fs.promises.access(filePath);
+  } catch {
+    // File doesn't exist, create it with empty array
+    await fs.promises.writeFile(filePath, '[]');
+  }
+  return filePath;
+}
+
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { name, email, phone, source, propertyInterest, message } = body;
+    const data = await request.json();
 
     // Validate required fields
-    if (!name || !email || !phone) {
+    if (!data.name || !data.email || !data.phone) {
       return NextResponse.json(
         { error: 'Name, email, and phone are required' },
         { status: 400 }
@@ -38,7 +60,7 @@ export async function POST(request: Request) {
 
     // Validate email format
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(data.email)) {
       return NextResponse.json(
         { error: 'Invalid email format' },
         { status: 400 }
@@ -47,7 +69,7 @@ export async function POST(request: Request) {
 
     // Validate phone format (10 digits)
     const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phone.replace(/[^0-9]/g, ''))) {
+    if (!phoneRegex.test(data.phone.replace(/[^0-9]/g, ''))) {
       return NextResponse.json(
         { error: 'Invalid phone number format' },
         { status: 400 }
@@ -55,9 +77,8 @@ export async function POST(request: Request) {
     }
 
     // Additional validation for project enquiries
-    if (source === 'Project Enquiry') {
-      const { projectId, projectTitle } = body;
-      if (!projectId || !projectTitle) {
+    if (data.source === 'Project Enquiry') {
+      if (!data.projectId || !data.projectTitle) {
         return NextResponse.json(
           { error: 'Project ID and title are required for project enquiries' },
           { status: 400 }
@@ -66,8 +87,8 @@ export async function POST(request: Request) {
     }
 
     // Additional validation for contact form
-    if (source === 'Contact Form') {
-      if (!propertyInterest || !message) {
+    if (data.source === 'Contact Form') {
+      if (!data.propertyInterest || !data.message) {
         return NextResponse.json(
           { error: 'Property interest and message are required for contact form' },
           { status: 400 }
@@ -76,35 +97,41 @@ export async function POST(request: Request) {
     }
 
     // Create new lead object
-    const newLead = {
-      id: Date.now().toString(),
-      name,
-      email,
-      phone,
-      propertyInterest: source === 'Project Enquiry' ? body.projectTitle : propertyInterest,
-      message: source === 'Project Enquiry' ? `Interested in ${body.projectTitle}` : message,
+    const newLead: Lead = {
+      id: uuidv4(),
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      propertyInterest: data.propertyInterest || 'Not specified',
+      projectId: data.projectId || undefined,
+      projectTitle: data.projectTitle || undefined,
+      message: data.message || '',
+      source: data.source || 'Contact Form',
       date: new Date().toISOString(),
-      status: 'new'
+      status: 'New'
     };
 
-    // Read existing leads
-    const filePath = path.join(process.cwd(), 'src', 'data', 'leads.json');
+    // Get the leads file path and ensure it exists
+    const filePath = await ensureLeadsFile();
     let leads = [];
     
-    // Read the file
     try {
-      const fileContent = await fs.readFile(filePath, 'utf-8');
+      const fileContent = await fs.promises.readFile(filePath, 'utf8');
       leads = JSON.parse(fileContent);
     } catch (error) {
-      // If file doesn't exist or is empty, start with empty array
-      leads = [];
+      console.error('Error reading leads file:', error);
     }
 
-    // Add new lead to the beginning of the array
-    leads.unshift(newLead);
+    // Add new lead
+    leads.push(newLead);
 
-    // Write back to file
-    await fs.writeFile(filePath, JSON.stringify(leads, null, 2));
+    // Save updated leads
+    try {
+      await fs.promises.writeFile(filePath, JSON.stringify(leads, null, 2));
+    } catch (error) {
+      console.error('Error writing to leads file:', error);
+      throw new Error('Failed to save lead');
+    }
 
     // Send email notification
     try {
@@ -114,23 +141,23 @@ export async function POST(request: Request) {
           <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
             <tr>
               <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Name:</strong></td>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${name}</td>
+              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.name}</td>
             </tr>
             <tr>
               <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Email:</strong></td>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${email}</td>
+              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.email}</td>
             </tr>
             <tr>
               <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Phone:</strong></td>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${phone}</td>
+              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.phone}</td>
             </tr>
             <tr>
               <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Property Interest:</strong></td>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${propertyInterest}</td>
+              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.propertyInterest}</td>
             </tr>
             <tr>
               <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Message:</strong></td>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${message}</td>
+              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.message}</td>
             </tr>
             <tr>
               <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Date:</strong></td>
@@ -153,11 +180,15 @@ export async function POST(request: Request) {
       // Continue with the submission even if email fails
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ 
+      success: true,
+      message: 'Lead created successfully',
+      lead: newLead 
+    });
   } catch (error) {
-    console.error('Error processing enquiry:', error);
+    console.error('Error processing lead:', error);
     return NextResponse.json(
-      { error: 'Failed to process enquiry' },
+      { error: 'Failed to process lead' },
       { status: 500 }
     );
   }

@@ -78,29 +78,34 @@ export default function Contact() {
         }),
       });
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        // Show success message
-        toast.success('Thank you for your interest! Our team will contact you soon.', {
-          duration: 5000,
-        });
-
-        // Reset form
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          propertyInterest: '',
-          message: ''
-        });
-
-        // Redirect to WhatsApp with the submitted data
-        redirectToWhatsApp(submittedData);
-      } else {
+      if (!response.ok) {
+        const data = await response.json();
         throw new Error(data.error || 'Failed to submit form');
       }
 
+      const data = await response.json();
+
+      // Add to Redux store if needed
+      if (data.success && data.lead) {
+        dispatch(addLead(data.lead));
+      }
+
+      // Show success message
+      toast.success('Thank you for your interest! Our team will contact you soon.', {
+        duration: 5000,
+      });
+
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        propertyInterest: '',
+        message: ''
+      });
+
+      // Redirect to WhatsApp with the submitted data
+      redirectToWhatsApp(submittedData);
     } catch (error) {
       console.error('Error submitting form:', error);
       toast.error(error instanceof Error ? error.message : 'Something went wrong');
