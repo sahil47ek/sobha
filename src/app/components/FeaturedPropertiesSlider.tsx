@@ -30,7 +30,7 @@ export default function FeaturedPropertiesSlider({ properties }: FeaturedPropert
   };
 
   useEffect(() => {
-    const timer = setInterval(nextSlide, 5000);
+    const timer = setInterval(nextSlide, 8000);
     return () => clearInterval(timer);
   }, []);
 
@@ -73,7 +73,7 @@ export default function FeaturedPropertiesSlider({ properties }: FeaturedPropert
                           {property.badges.map((badge, idx) => (
                             <span
                               key={idx}
-                              className="px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-medium bg-primary/10 text-primary rounded-full"
+                              className="px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-medium bg-white text-black rounded-full"
                             >
                               {badge}
                             </span>

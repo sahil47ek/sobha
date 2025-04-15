@@ -2,6 +2,7 @@ export interface ProjectMedia {
   id: string;
   mainImage: string;
   videoUrl?: string;
+  embedVideo?: string;
   gallery: string[];
 }
 
@@ -9,33 +10,57 @@ export interface ProjectMedia {
 export const projectMedia: Record<string, ProjectMedia> = {
   'sobha-neopolis': {
     id: 'sobha-neopolis',
-    mainImage: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop',
-    videoUrl: '/videos/sobha-neopolis.mp4',
+    mainImage: '/images/projects/neopolis/1.jpg',
+    videoUrl: '/images/projects/neopolis/neopolis.mp4',
     gallery: [
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop'
+      '/images/projects/neopolis/1.jpg',
+      '/images/projects/neopolis/2.webp',
+      '/images/projects/neopolis/3.webp',
+      '/images/projects/neopolis/4.webp',
+      '/images/projects/neopolis/5.webp',
+      '/images/projects/neopolis/6.webp',
+      '/images/projects/neopolis/7.webp',
+      '/images/projects/neopolis/8.webp',
+      '/images/projects/neopolis/9.webp',
+      '/images/projects/neopolis/10.webp',
+      '/images/projects/neopolis/11.webp',
+      '/images/projects/neopolis/12.webp',
+      '/images/projects/neopolis/13.webp',
+      '/images/projects/neopolis/14.jpg',
+      '/images/projects/neopolis/15.jpg'
     ]
   },
   'sobha-infinia': {
     id: 'sobha-infinia',
-    mainImage: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop',
+    mainImage: '/images/projects/infinia/1.webp',
     gallery: [
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&auto=format&fit=crop'
+      '/images/projects/infinia/1.webp',
+      '/images/projects/infinia/2.webp',
+      '/images/projects/infinia/3.webp',
+      '/images/projects/infinia/4.webp',
+      '/images/projects/infinia/5.jpg',
+      '/images/projects/infinia/6.jpg',
+      '/images/projects/infinia/7.webp',
+      '/images/projects/infinia/8.webp',
+      '/images/projects/infinia/9.jpg',
+      '/images/projects/infinia/10.jpg',
+      '/images/projects/infinia/11.jpg'
     ]
   },
   'sobha-galera': {
     id: 'sobha-galera',
-    mainImage: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop',
+    mainImage: '/images/projects/galera/1.webp',
+    videoUrl: '/images/projects/galera/galera.mp4',
     gallery: [
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop'
+      '/images/projects/galera/2.webp',
+      '/images/projects/galera/3.webp',
+      '/images/projects/galera/4.webp',
+      '/images/projects/galera/5.webp',
+      '/images/projects/galera/6.webp',
+      '/images/projects/galera/7.webp',
+      '/images/projects/galera/8.webp',
+      '/images/projects/galera/9.webp',
+      '/images/projects/galera/10.webp'
     ]
   },
   'sobha-ayana': {
@@ -63,6 +88,16 @@ export const projectMedia: Record<string, ProjectMedia> = {
       '/images/projects/crystal-meadows/8.webp',
       '/images/projects/crystal-meadows/9.webp',
       '/images/projects/crystal-meadows/10.webp'
+    ]
+  },
+  'sobha-townpark': {
+    id: 'sobha-townpark',
+    mainImage: '/images/projects/townpark/1.jpg',
+    embedVideo: 'https://www.youtube.com/embed/7tYW1QHb1kA?list=TLGGAsAwhkh0BooxNTA0MjAyNQ&autoplay=1&mute=1&loop=1&playlist=7tYW1QHb1kA&controls=0&showinfo=0&rel=0',
+    gallery: [
+      '/images/projects/townpark/1.jpg',
+      '/images/projects/townpark/2.jpg',
+      '/images/projects/townpark/3.jpg'
     ]
   }
 }; 

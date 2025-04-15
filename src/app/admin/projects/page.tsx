@@ -18,7 +18,6 @@ interface ProjectFormData {
   location: string;
   city: City;
   price: string;
-  specs: string;
   badges: string[];
   amenities: string[];
   features: string[];
@@ -51,21 +50,24 @@ const sendProjectEmail = async (projectData: Project) => {
           location: projectData.location,
           city: projectData.city,
           status: projectData.status,
-          specs: projectData.specs,
+          specs: projectData.details.bhk,
           details: projectData.details,
           featured: projectData.featured ? 'Yes' : 'No'
         }
       }),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      throw new Error('Failed to send email');
+      throw new Error(data.message || 'Failed to send email');
     }
 
-    return await response.json();
+    return data;
   } catch (error) {
     console.error('Error sending project email:', error);
-    throw error;
+    // Instead of throwing, return an error object
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to send email' };
   }
 };
 
@@ -84,11 +86,10 @@ export default function ProjectsManagement() {
     city: cities[0],
     status: projectStatus[0],
     location: '',
-    specs: '',
-    featured: false,
     badges: [],
     amenities: [],
     features: [],
+    featured: false,
     details: {
       bhk: '',
       landParcel: '',
@@ -137,11 +138,10 @@ export default function ProjectsManagement() {
       city: project.city as City,
       status: project.status as ProjectStatus,
       location: project.location,
-      specs: project.specs,
-      featured: project.featured,
       badges: project.badges || [],
       amenities: project.amenities || [],
       features: project.features || [],
+      featured: project.featured,
       details: {
         bhk: project.details?.bhk || '',
         landParcel: project.details?.landParcel || '',
@@ -219,10 +219,10 @@ export default function ProjectsManagement() {
         location: formData.location,
         city: formData.city,
         price: formData.price,
-        specs: formData.specs,
+        specs: formData.details.bhk,
         status: formData.status,
         featured: formData.featured,
-        badges: [formData.status], // Add status as a badge
+        badges: [formData.status],
         amenities: formData.amenities,
         features: formData.features,
         details: {
@@ -237,10 +237,9 @@ export default function ProjectsManagement() {
       };
 
       // Send email with project details
-      try {
-        await sendProjectEmail(projectData);
-      } catch (error) {
-        console.error('Error sending project email:', error);
+      const emailResult = await sendProjectEmail(projectData);
+      if (!emailResult.success) {
+        console.warn('Email notification failed:', emailResult.error);
         // Continue with form submission even if email fails
       }
 
@@ -267,11 +266,10 @@ export default function ProjectsManagement() {
         city: cities[0],
         status: projectStatus[0],
         location: '',
-        specs: '',
-        featured: false,
         badges: [],
         amenities: [],
         features: [],
+        featured: false,
         details: {
           bhk: '',
           landParcel: '',
@@ -283,10 +281,15 @@ export default function ProjectsManagement() {
       });
 
       // Show success message
-      alert(editingProject ? 'Project updated successfully!' : 'Project added successfully!');
+      toast.success(editingProject ? 'Project updated successfully!' : 'Project added successfully!');
     } catch (error) {
       console.error('Error submitting project:', error);
-      alert('Error saving project. Please try again.');
+      toast.error('Error saving project. Please try again.');
+    } finally {
+      // Reset button state
+      const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+      submitButton.disabled = false;
+      submitButton.innerText = editingProject ? 'Update Project' : 'Add Project';
     }
   };
 
@@ -301,11 +304,10 @@ export default function ProjectsManagement() {
       city: cities[0],
       status: projectStatus[0],
       location: '',
-      specs: '',
-      featured: false,
       badges: [],
       amenities: [],
       features: [],
+      featured: false,
       details: {
         bhk: '',
         landParcel: '',
@@ -387,7 +389,7 @@ export default function ProjectsManagement() {
                       <div className="text-sm font-medium text-gray-900">
                         {project.title}
                       </div>
-                      <div className="text-sm text-gray-500">{project.specs}</div>
+                      <div className="text-sm text-gray-500">{project.details.bhk}</div>
                     </div>
                   </div>
                 </td>
@@ -529,32 +531,16 @@ export default function ProjectsManagement() {
               </div>
 
               {/* Status and Specifications */}
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
-                  </label>
-                  <CustomDropdown
-                    options={projectStatus.map(status => ({ value: status, label: status }))}
-                    value={formData.status}
-                    onChange={handleStatusChange}
-                    placeholder="Select Status"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Specifications
-                  </label>
-                  <input
-                    name="specs"
-                    type="text"
-                    required
-                    value={formData.specs}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    placeholder="e.g., 3 & 4 BHK Luxury Apartments"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Status
+                </label>
+                <CustomDropdown
+                  options={projectStatus.map(status => ({ value: status, label: status }))}
+                  value={formData.status}
+                  onChange={handleStatusChange}
+                  placeholder="Select Status"
+                />
               </div>
 
               {/* Project Details */}

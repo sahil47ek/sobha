@@ -8,7 +8,7 @@ import { projectMedia } from '@/data/projectMedia';
 import ProjectEnquiryForm from '@/components/ProjectEnquiryForm';
 import { useAppSelector } from '@/store/store';
 import Navbar from '@/app/components/Navbar';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { testimonials } from '@/data/testimonials';
 import TestimonialsSlider from '@/app/components/TestimonialsSlider';
 
@@ -18,9 +18,10 @@ export default function ProjectPage() {
   const projectId = params?.id as string;
   const [project, setProject] = useState<Project | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>('');
-  const { projects } = useAppSelector((state) => state.projects);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const { projects } = useAppSelector((state) => state.projects);
 
+  // Move all useEffect hooks together at the top level
   useEffect(() => {
     // Debug logs
     console.log('Current URL params:', params);
@@ -41,6 +42,39 @@ export default function ProjectPage() {
       }
     }
   }, [projectId, projects, params]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!galleryOpen) return;
+      
+      if (e.key === 'ArrowLeft') {
+        handlePrevImage();
+      } else if (e.key === 'ArrowRight') {
+        handleNextImage();
+      } else if (e.key === 'Escape') {
+        setGalleryOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [galleryOpen]);
+
+  const handlePrevImage = () => {
+    if (!project) return;
+    const media = projectMedia[project.id];
+    const currentIndex = media.gallery.indexOf(selectedImage);
+    const prevIndex = currentIndex > 0 ? currentIndex - 1 : media.gallery.length - 1;
+    setSelectedImage(media.gallery[prevIndex]);
+  };
+
+  const handleNextImage = () => {
+    if (!project) return;
+    const media = projectMedia[project.id];
+    const currentIndex = media.gallery.indexOf(selectedImage);
+    const nextIndex = currentIndex < media.gallery.length - 1 ? currentIndex + 1 : 0;
+    setSelectedImage(media.gallery[nextIndex]);
+  };
 
   // Add loading state
   if (!projectId || !projects.length) {
@@ -116,8 +150,21 @@ export default function ProjectPage() {
       <Navbar />
       <main className="pt-16 sm:pt-20">
         {/* Hero Section */}
-        <section className="relative h-[40vh] sm:h-[50vh] md:h-[60vh] bg-black">
-          {media.videoUrl ? (
+        <section className="relative h-[40vh] sm:h-[50vh] md:h-[75vh] bg-black">
+          {media.embedVideo ? (
+            <>
+              <div className="absolute inset-0 w-full h-full">
+                <iframe
+                  src={media.embedVideo}
+                  title={`${project.title} Video`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+            </>
+          ) : media.videoUrl ? (
             <>
               <video
                 autoPlay
@@ -173,8 +220,8 @@ export default function ProjectPage() {
             </div>
           </div>
 
-          {/* Video Controls */}
-          {media.videoUrl && (
+          {/* Video Controls - Only show for local videos */}
+          {media.videoUrl && !media.embedVideo && (
             <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:top-8 md:right-8">
               <button
                 onClick={(e) => {
@@ -322,6 +369,22 @@ export default function ProjectPage() {
               <XMarkIcon className="h-8 w-8" />
             </button>
             
+            <button
+              onClick={handlePrevImage}
+              className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-all duration-200 group"
+              aria-label="Previous image"
+            >
+              <ChevronLeftIcon className="h-8 w-8 group-hover:scale-110 transition-transform duration-200" />
+            </button>
+
+            <button
+              onClick={handleNextImage}
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-all duration-200 group"
+              aria-label="Next image"
+            >
+              <ChevronRightIcon className="h-8 w-8 group-hover:scale-110 transition-transform duration-200" />
+            </button>
+            
             <div className="relative w-full max-w-6xl">
               <Image
                 src={selectedImage}
@@ -331,14 +394,15 @@ export default function ProjectPage() {
                 className="w-full h-auto max-h-[85vh] object-contain rounded-lg"
               />
               
-              {/* Navigation Thumbnails */}
               <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 flex gap-2 overflow-x-auto max-w-full p-2">
                 {media.gallery.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(image)}
-                    className={`relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 ${
-                      selectedImage === image ? 'ring-2 ring-white' : 'opacity-50 hover:opacity-100'
+                    className={`relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 transition-all duration-200 ${
+                      selectedImage === image 
+                        ? 'ring-2 ring-white scale-110' 
+                        : 'opacity-50 hover:opacity-100 hover:scale-105'
                     }`}
                   >
                     <Image

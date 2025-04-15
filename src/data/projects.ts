@@ -33,6 +33,58 @@ export interface Project {
 // Sample projects data
 export const projects: Project[] = [
   {
+    id: 'sobha-townpark',
+    title: 'Sobha Townpark',
+    subtitle: 'New York Inspired Living',
+    description: 'Vibrant and suave, challenging yet inspiring, New York is a city of possibilities. Living here is a statement – the one that differentiates you. The lifestyle you have always admired and desired for is coming closer to you. SOBHA presents Bengaluru\'s first-ever, self-sufficient residential township crafted in the architectural footsteps of New York. Come, bask in its sparkle and stride to the future with aplomb. Located near Electronic City in South Bengaluru, brimming with potential to be the next hub, these iconic residences will usher you into a world of unparalleled luxury.',
+    location: 'Hosur Road',
+    city: 'Bangalore',
+    price: 'Starting From ₹ 90L Onwards*',
+    specs: '1/2/3/4 BHK Apartments',
+    badges: ['Tallest Building in Bengaluru', 'Launching New Phase 3'],
+    amenities: [
+      'Swimming Pool',
+      'Clubhouse',
+      'Gym',
+      'Children\'s Play Area',
+      'Indoor Games',
+      'Landscaped Gardens',
+      'Jogging Track',
+      'Tennis Court',
+      'Basketball Court',
+      'Amphitheatre',
+      'Yoga Deck',
+      'Meditation Zone'
+    ],
+    features: [
+      'Premium Flooring',
+      'Modular Kitchen',
+      'High-end Fixtures',
+      'Smart Home Features',
+      'Spacious Balconies',
+      'Ample Parking',
+      'High-speed Elevators',
+      '24/7 Security'
+    ],
+    featured: true,
+    status: 'Under Construction',
+    details: {
+      bhk: '1/2/3/4 BHK',
+      landParcel: '33 Acres',
+      units: '2000+',
+      floors: '1B + G + 44',
+      theme: 'New York Inspired Living',
+      fullDescription: [
+        'Vibrant and suave, challenging yet inspiring, New York is a city of possibilities.',
+        'Living here is a statement – the one that differentiates you.',
+        'The lifestyle you have always admired and desired for is coming closer to you.',
+        'SOBHA presents Bengaluru\'s first-ever, self-sufficient residential township crafted in the architectural footsteps of New York.',
+        'Come, bask in its sparkle and stride to the future with aplomb.',
+        'Located near Electronic City in South Bengaluru, brimming with potential to be the next hub, these iconic residences will usher you into a world of unparalleled luxury.'
+      ]
+    }
+  },
+  {
     id: 'sobha-neopolis',
     title: 'Sobha Neopolis',
     subtitle: 'Modern Urban Living',
