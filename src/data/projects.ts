@@ -39,7 +39,7 @@ export const projects: Project[] = [
     description: 'Vibrant and suave, challenging yet inspiring, New York is a city of possibilities. Living here is a statement – the one that differentiates you. The lifestyle you have always admired and desired for is coming closer to you. SOBHA presents Bengaluru\'s first-ever, self-sufficient residential township crafted in the architectural footsteps of New York. Come, bask in its sparkle and stride to the future with aplomb. Located near Electronic City in South Bengaluru, brimming with potential to be the next hub, these iconic residences will usher you into a world of unparalleled luxury.',
     location: 'Hosur Road',
     city: 'Bangalore',
-    price: 'Starting From ₹ 90L Onwards*',
+    price: '₹ 90L*',
     specs: '1/2/3/4 BHK Apartments',
     badges: ['Tallest Building in Bengaluru', 'Launching New Phase 3'],
     amenities: [

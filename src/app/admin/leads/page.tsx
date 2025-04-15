@@ -60,7 +60,12 @@ export default function LeadsManagement() {
         toast.success('Lead deleted successfully');
       } catch (error) {
         console.error('Error deleting lead:', error);
-        toast.error(error instanceof Error ? error.message : 'Failed to delete lead');
+        const errorMessage = error instanceof Error ? error.message : 'Failed to delete lead';
+        toast.error(errorMessage);
+        
+        if (errorMessage.includes('Server configuration')) {
+          toast.error('This action is temporarily unavailable. Please try again later or contact support.');
+        }
       }
     }
   };

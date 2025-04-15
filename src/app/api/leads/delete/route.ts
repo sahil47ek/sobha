@@ -38,6 +38,18 @@ export async function POST(request: Request) {
 
     // Read the current leads
     const filePath = path.join(process.cwd(), 'src', 'data', 'leads.json');
+    
+    // Check if file exists and is writable
+    try {
+      await fs.access(filePath, fs.constants.W_OK);
+    } catch (error) {
+      console.error('File permission error:', error);
+      return NextResponse.json(
+        { error: 'Server configuration error. Please contact administrator.' },
+        { status: 500 }
+      );
+    }
+
     let leads: Lead[] = [];
     
     try {
@@ -65,8 +77,15 @@ export async function POST(request: Request) {
     leads.splice(leadIndex, 1);
 
     try {
-      // Write back to the file
+      // Create a backup of the current file
+      const backupPath = `${filePath}.backup`;
+      await fs.writeFile(backupPath, JSON.stringify(leads, null, 2));
+      
+      // Write the new data
       await fs.writeFile(filePath, JSON.stringify(leads, null, 2));
+      
+      // Remove the backup if write was successful
+      await fs.unlink(backupPath);
     } catch (error) {
       console.error('Error writing leads file:', error);
       return NextResponse.json(
