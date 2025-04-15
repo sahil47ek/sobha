@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
+import { writeFile, access, constants } from 'fs/promises';
 import { join } from 'path';
 import { mkdir } from 'fs/promises';
 
@@ -52,26 +52,47 @@ export async function POST(request: NextRequest) {
     const directory = isVideo ? 'videos' : 'properties';
     const publicDir = join(process.cwd(), 'public', directory);
 
-    // Ensure directory exists
+    // Check if public directory exists and is writable
+    try {
+      await access(join(process.cwd(), 'public'), constants.W_OK);
+    } catch (error) {
+      console.error('Public directory is not writable:', error);
+      return NextResponse.json(
+        { error: 'Server configuration error - storage directory is not writable' },
+        { status: 500 }
+      );
+    }
+
+    // Ensure directory exists with proper error handling
     try {
       await mkdir(publicDir, { recursive: true });
     } catch (error) {
       console.error('Error creating directory:', error);
+      return NextResponse.json(
+        { error: 'Failed to create storage directory' },
+        { status: 500 }
+      );
     }
 
-    // Save the file
-    const path = join(publicDir, filename);
-    await writeFile(path, buffer);
-
-    // Return the public URL
-    return NextResponse.json({ 
-      path: `/${directory}/${filename}`,
-      message: 'File uploaded successfully' 
-    });
+    // Write file with proper error handling
+    try {
+      const filePath = join(publicDir, filename);
+      await writeFile(filePath, buffer);
+      
+      // Return the relative path that can be used in the frontend
+      const relativePath = `/${directory}/${filename}`;
+      return NextResponse.json({ path: relativePath });
+    } catch (error) {
+      console.error('Error writing file:', error);
+      return NextResponse.json(
+        { error: 'Failed to save file' },
+        { status: 500 }
+      );
+    }
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error('Upload error:', error);
     return NextResponse.json(
-      { error: 'Error uploading file' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
