@@ -1,8 +1,9 @@
 {
+  "/api/send-project-email/route": "app/api/send-project-email/route.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/projects/[id]/page": "app/projects/[id]/page.js",
   "/page": "app/page.js",
   "/projects/page": "app/projects/page.js",
-  "/admin/page": "app/admin/page.js",
-  "/admin/projects/page": "app/admin/projects/page.js"
+  "/projects/[id]/page": "app/projects/[id]/page.js",
+  "/admin/projects/page": "app/admin/projects/page.js",
+  "/admin/page": "app/admin/page.js"
 }
