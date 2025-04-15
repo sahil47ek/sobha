@@ -1,11 +1,10 @@
 {
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/api/leads/route": "app/api/leads/route.js",
   "/api/leads/delete/route": "app/api/leads/delete/route.js",
-  "/page": "app/page.js",
+  "/api/leads/route": "app/api/leads/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/projects/[id]/page": "app/projects/[id]/page.js",
   "/projects/page": "app/projects/page.js",
-  "/admin/projects/page": "app/admin/projects/page.js",
   "/admin/leads/page": "app/admin/leads/page.js",
-  "/admin/page": "app/admin/page.js"
+  "/admin/page": "app/admin/page.js",
+  "/admin/projects/page": "app/admin/projects/page.js"
 }

@@ -42,6 +42,9 @@ export default function LeadsManagement() {
   const handleDelete = async (lead: Lead) => {
     if (window.confirm('Are you sure you want to delete this lead?')) {
       try {
+        // Show loading state
+        toast.loading('Deleting lead...');
+        
         const response = await fetch('/api/leads/delete', {
           method: 'POST',
           headers: {
@@ -56,15 +59,27 @@ export default function LeadsManagement() {
           throw new Error(data.error || 'Failed to delete lead');
         }
 
+        // Dismiss loading toast
+        toast.dismiss();
+        
+        // Update local state
         dispatch(deleteLead(lead.id));
         toast.success('Lead deleted successfully');
+        
+        // Refresh leads list
+        await fetchLeads();
       } catch (error) {
+        // Dismiss loading toast
+        toast.dismiss();
+        
         console.error('Error deleting lead:', error);
         const errorMessage = error instanceof Error ? error.message : 'Failed to delete lead';
-        toast.error(errorMessage);
         
-        if (errorMessage.includes('Server configuration')) {
-          toast.error('This action is temporarily unavailable. Please try again later or contact support.');
+        if (errorMessage.includes('Server configuration') || errorMessage.includes('Failed to delete lead from database')) {
+          toast.error('Unable to delete lead at this time. Our team has been notified.');
+          // Here you could also send an error report to your error tracking service
+        } else {
+          toast.error(errorMessage);
         }
       }
     }

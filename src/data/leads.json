@@ -1,25 +1,5 @@
 [
   {
-    "id": "1742933376937",
-    "name": "test",
-    "email": "test@gmail.com",
-    "phone": "0000000000",
-    "propertyInterest": "Plots",
-    "message": "aaa",
-    "date": "2025-03-25T20:09:36.937Z",
-    "status": "new"
-  },
-  {
-    "id": "1742933326625",
-    "name": "Test User",
-    "email": "test@example.com",
-    "phone": "1234567890",
-    "propertyInterest": "Luxury Apartments",
-    "message": "Testing email notification",
-    "date": "2025-03-25T20:08:46.625Z",
-    "status": "new"
-  },
-  {
     "id": "1742932400062",
     "name": "Test User",
     "email": "test@example.com",
