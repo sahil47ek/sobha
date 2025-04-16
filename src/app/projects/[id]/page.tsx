@@ -335,8 +335,8 @@ export default function ProjectPage() {
                 </div>
               </div>
 
-              {/* Testimonials Section */}
-              {testimonials.filter(t => t.project === project.id).length > 0 && (
+              {/* Commenting out Testimonials Section for now */}
+              {/* {testimonials.filter(t => t.project === project.id).length > 0 && (
                 <div className="mt-8 sm:mt-12 md:mt-16">
                   <div className="text-center mb-6 sm:mb-8 md:mb-12">
                     <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-text-primary mb-2 sm:mb-3 md:mb-4">
@@ -353,7 +353,7 @@ export default function ProjectPage() {
                     />
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         </section>

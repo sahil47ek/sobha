@@ -1,10 +1,8 @@
 {
-  "/api/enquiry/route": "app/api/enquiry/route.js",
-  "/api/leads/route": "app/api/leads/route.js",
-  "/api/leads/delete/route": "app/api/leads/delete/route.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/projects/[id]/page": "app/projects/[id]/page.js",
   "/page": "app/page.js",
+  "/projects/[id]/page": "app/projects/[id]/page.js",
+  "/projects/page": "app/projects/page.js",
   "/_not-found/page": "app/_not-found/page.js",
   "/admin/page": "app/admin/page.js",
   "/admin/leads/page": "app/admin/leads/page.js",
