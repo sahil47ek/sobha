@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{\"app/projects/page.tsx -> ../components/Navbar\":{\"id\":\"app/projects/page.tsx -> ../components/Navbar\",\"files\":[]}}"
+self.__REACT_LOADABLE_MANIFEST="{}"

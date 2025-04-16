@@ -119,19 +119,22 @@ export default function Contact() {
       city: 'Bangalore',
       address: 'Sobha Corporate Office, Sarjapur - Marathahalli Outer Ring Rd',
       phone: '+91 80 4960 5000',
-      email: 'bangalore@sobha.com'
+      email: 'bangalore@sobha.com',
+      mapsUrl: 'https://goo.gl/maps/QZPz8K9nkQD2XyVt8'
     },
     {
       city: 'Mumbai',
       address: 'Sobha House, Andheri East, Mumbai',
       phone: '+91 22 4960 5000',
-      email: 'mumbai@sobha.com'
+      email: 'mumbai@sobha.com',
+      mapsUrl: 'https://goo.gl/maps/YHJ6rL8WLZL2'
     },
     {
       city: 'Delhi NCR',
       address: 'Sobha City, Sector 108, Gurgaon',
       phone: '+91 124 4960 5000',
-      email: 'delhi@sobha.com'
+      email: 'delhi@sobha.com',
+      mapsUrl: 'https://goo.gl/maps/3X4Z5C6V7JK2'
     }
   ];
 
@@ -256,32 +259,22 @@ export default function Contact() {
                           <EnvelopeIcon className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
                           <p className="text-sm sm:text-base text-gray-600">{office.email}</p>
                         </div>
+                        <div className="mt-4">
+                          <a
+                            href={office.mapsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-black/80 transition-colors text-sm"
+                          >
+                            <MapPinIcon className="w-4 h-4" />
+                            <span>View Location</span>
+                          </a>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Map Section */}
-        <section className="pb-6 sm:pb-12 md:pb-20 bg-secondary">
-          <div className="container mx-auto px-4">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-text-primary text-center mb-4 sm:mb-8 md:mb-12">
-              Visit Our Experience Centers
-            </h2>
-            <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-lg">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.5829025224435!2d77.64023531482193!3d12.937406090878037!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae1453952c5f5d%3A0x9c5c91f2c59b7d9f!2sSobha%20Limited!5e0!3m2!1sen!2sin!4v1645524557177!5m2!1sen!2sin"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="w-full h-full"
-              ></iframe>
             </div>
           </div>
         </section>
