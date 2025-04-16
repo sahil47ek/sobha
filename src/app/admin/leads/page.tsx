@@ -42,7 +42,6 @@ export default function LeadsManagement() {
   const handleDelete = async (lead: Lead) => {
     if (window.confirm('Are you sure you want to delete this lead?')) {
       try {
-        // Show loading state
         const loadingToast = toast.loading('Deleting lead...');
         
         const response = await fetch('/api/leads/delete', {
@@ -54,19 +53,14 @@ export default function LeadsManagement() {
         });
 
         const data = await response.json();
-
-        // Dismiss loading toast
         toast.dismiss(loadingToast);
 
         if (!response.ok) {
           throw new Error(data.error || 'Failed to delete lead');
         }
 
-        // Update UI and show success
         dispatch(deleteLead(lead.id));
         toast.success('Lead deleted successfully');
-        
-        // Refresh leads list
         await fetchLeads();
       } catch (error) {
         console.error('Error deleting lead:', error);
@@ -85,7 +79,7 @@ export default function LeadsManagement() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Leads Management</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Manage and track your leads from the contact form
+          Manage and track your leads from contact form and project enquiries
         </p>
       </div>
 
@@ -104,6 +98,9 @@ export default function LeadsManagement() {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Contact Info
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Source
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Interest
@@ -126,8 +123,17 @@ export default function LeadsManagement() {
                       <div className="text-sm text-gray-900">{lead.email}</div>
                       <div className="text-sm text-gray-500">{lead.phone}</div>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        lead.source === 'Project Enquiry' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {lead.source}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {lead.propertyInterest}
+                      {lead.source === 'Project Enquiry' ? lead.projectTitle : lead.propertyInterest}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex items-center space-x-4">
@@ -201,14 +207,41 @@ export default function LeadsManagement() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Property Interest</label>
-                <p className="mt-1 text-sm text-gray-900">{selectedLead.propertyInterest}</p>
+                <label className="block text-sm font-medium text-gray-700">Source</label>
+                <span className={`mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  selectedLead.source === 'Project Enquiry' 
+                    ? 'bg-blue-100 text-blue-800' 
+                    : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {selectedLead.source}
+                </span>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Message</label>
-                <p className="mt-1 text-sm text-gray-900">{selectedLead.message}</p>
-              </div>
+              {selectedLead.source === 'Project Enquiry' ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Project Details</label>
+                  <div className="mt-1 space-y-2">
+                    <p className="text-sm text-gray-900">
+                      <span className="font-medium">Project:</span> {selectedLead.projectTitle}
+                    </p>
+                    <p className="text-sm text-gray-900">
+                      <span className="font-medium">Project ID:</span> {selectedLead.projectId}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Property Interest</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedLead.propertyInterest}</p>
+                </div>
+              )}
+
+              {selectedLead.message && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Message</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedLead.message}</p>
+                </div>
+              )}
             </div>
 
             <div className="mt-8 flex justify-end">

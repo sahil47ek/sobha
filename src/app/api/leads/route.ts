@@ -36,13 +36,20 @@ async function ensureLeadsFile() {
 
 export async function POST(request: Request) {
   try {
-    const lead = await request.json();
+    const data = await request.json();
     
     // Add timestamp and ID to the lead
     const newLead = {
-      ...lead,
       id: uuidv4(),
-      timestamp: new Date().toISOString()
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      projectId: data.projectId || null,
+      projectTitle: data.projectTitle || null,
+      source: data.source || 'Website',
+      timestamp: new Date().toISOString(),
+      status: 'New',
+      message: data.message || ''
     };
 
     // Get the leads file path and ensure it exists
@@ -74,8 +81,9 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ 
+      success: true, 
       message: 'Lead created successfully',
-      lead: newLead 
+      lead: newLead
     });
   } catch (error) {
     console.error('Error processing lead:', error);

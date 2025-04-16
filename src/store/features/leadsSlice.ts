@@ -5,10 +5,12 @@ export interface Lead {
   name: string;
   email: string;
   phone: string;
-  propertyInterest: string;
-  message: string;
   date: string;
-  status: 'new' | 'contacted' | 'qualified' | 'converted' | 'lost';
+  source: 'Contact Form' | 'Project Enquiry';
+  propertyInterest?: string;
+  message?: string;
+  projectId?: string;
+  projectTitle?: string;
 }
 
 interface LeadsState {
@@ -30,26 +32,20 @@ export const leadsSlice = createSlice({
     setLeads: (state, action: PayloadAction<Lead[]>) => {
       state.leads = action.payload;
     },
-    addLead: (state, action: PayloadAction<Omit<Lead, 'id' | 'date' | 'status'>>) => {
-      const newLead: Lead = {
-        ...action.payload,
-        id: Date.now().toString(),
-        date: new Date().toISOString(),
-        status: 'new'
-      };
-      state.leads.unshift(newLead);
-    },
-    updateLeadStatus: (state, action: PayloadAction<{ id: string; status: Lead['status'] }>) => {
-      const lead = state.leads.find(l => l.id === action.payload.id);
-      if (lead) {
-        lead.status = action.payload.status;
-      }
+    addLead: (state, action: PayloadAction<Lead>) => {
+      state.leads.push(action.payload);
     },
     deleteLead: (state, action: PayloadAction<string>) => {
       state.leads = state.leads.filter(lead => lead.id !== action.payload);
     },
+    updateLead: (state, action: PayloadAction<Lead>) => {
+      const index = state.leads.findIndex(lead => lead.id === action.payload.id);
+      if (index !== -1) {
+        state.leads[index] = action.payload;
+      }
+    },
   },
 });
 
-export const { setLeads, addLead, updateLeadStatus, deleteLead } = leadsSlice.actions;
+export const { setLeads, addLead, deleteLead, updateLead } = leadsSlice.actions;
 export default leadsSlice.reducer; 

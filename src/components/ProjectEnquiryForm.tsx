@@ -83,8 +83,15 @@ Phone: ${data.phone}`;
 
       // Add to Redux store
       dispatch(addLead({
-        ...formData,
-        propertyInterest: projectTitle,
+        id: data.id,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        projectId,
+        projectTitle,
+        source: 'Project Enquiry',
+        date: new Date().toISOString(),
+        status: 'New',
         message: `Interested in ${projectTitle}`
       }));
       
