@@ -1,9 +1,4 @@
 {
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/api/enquiry/route": "app/api/enquiry/route.js",
-  "/api/leads/route": "app/api/leads/route.js",
-  "/projects/[id]/page": "app/projects/[id]/page.js",
-  "/page": "app/page.js",
-  "/admin/leads/page": "app/admin/leads/page.js",
-  "/contact/page": "app/contact/page.js"
+  "/page": "app/page.js"
 }

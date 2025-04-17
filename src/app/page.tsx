@@ -154,11 +154,11 @@ export default function Home() {
             </button>
 
             <div className="p-6 md:p-8">
-              <h2 className="text-2xl font-bold text-text-primary mb-6">
+              <h2 className="text-xl font-bold text-text-primary mb-2">
                 Get in Touch with Sobha
               </h2>
-              <p className="text-gray-600 mb-6">
-                Fill out the form below and our team will get back to you shortly.
+              <p className="text-sm text-gray-600 mb-4">
+                Fill out the form below and we will get back to you shortly.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
