@@ -153,7 +153,7 @@ export default function Home() {
               </svg>
             </button>
 
-            <div className="p-6 md:p-8">
+            <div className="p-6 md:px-6">
               <h2 className="text-xl font-bold text-text-primary mb-2">
                 Get in Touch with Sobha
               </h2>
