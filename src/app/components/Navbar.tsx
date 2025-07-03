@@ -12,7 +12,8 @@ import {
   MapPinIcon,
   ClockIcon
 } from '@heroicons/react/24/outline';
-import { useAppSelector } from '@/store/store';
+import { useAppSelector, useAppDispatch } from '@/store/store';
+import { setProjects, setLoading, setError } from '@/store/features/projectsSlice';
 
 const SocialIcons = ({ className = '' }: { className?: string }) => (
   <div className={`flex items-center space-x-4 ${className}`}>
@@ -60,8 +61,34 @@ export default function Navbar() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const projects = useAppSelector((state) => state.projects.projects);
+  const dispatch = useAppDispatch();
   
   const sidebarRef = useRef<HTMLDivElement>(null);
+
+  // Fetch projects from API on mount
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        dispatch(setLoading(true));
+        const response = await fetch('/api/projects');
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          dispatch(setProjects(data.projects));
+        } else {
+          console.error('Failed to fetch projects:', data.error);
+          dispatch(setError(data.error || 'Failed to fetch projects'));
+        }
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+        dispatch(setError('Failed to fetch projects'));
+      } finally {
+        dispatch(setLoading(false));
+      }
+    };
+
+    fetchProjects();
+  }, [dispatch]);
 
   useEffect(() => {
     const handleScroll = () => {

@@ -9,6 +9,17 @@ import { useAppSelector } from '@/store/store';
 import { v4 as uuidv4 } from 'uuid';
 import CustomDropdown from '@/components/CustomDropdown';
 import { toast } from 'react-hot-toast';
+import { setLoading, setProjects, setError } from '@/store/features/projectsSlice';
+
+// Utility function to safely parse JSON responses
+const safeJsonParse = async (response: Response) => {
+  try {
+    return await response.json();
+  } catch (error) {
+    console.error('Error parsing JSON response:', error);
+    return { error: 'Invalid response from server' };
+  }
+};
 
 interface ProjectFormData {
   id: string;
@@ -36,6 +47,11 @@ interface ProjectFormData {
 // Add email sending function
 const sendProjectEmail = async (projectData: Project) => {
   try {
+    // Validate input
+    if (!projectData || !projectData.title) {
+      return { success: false, error: 'Invalid project data' };
+    }
+
     const response = await fetch('/api/send-project-email', {
       method: 'POST',
       headers: {
@@ -57,17 +73,34 @@ const sendProjectEmail = async (projectData: Project) => {
       }),
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to send email');
+    // Handle network errors
+    if (!response) {
+      return { success: false, error: 'Network error: No response from server' };
     }
 
-    return data;
+    // Parse response safely
+    let data;
+    try {
+      data = await response.json();
+    } catch (jsonError) {
+      console.error('JSON parsing error:', jsonError);
+      return { success: false, error: 'Invalid response format from server' };
+    }
+
+    // Handle API errors
+    if (!response.ok) {
+      const errorMessage = data?.error || data?.message || `HTTP ${response.status}: ${response.statusText}`;
+      return { success: false, error: errorMessage };
+    }
+
+    // Return success
+    return data || { success: true };
   } catch (error) {
-    console.error('Error sending project email:', error);
-    // Instead of throwing, return an error object
-    return { success: false, error: error instanceof Error ? error.message : 'Failed to send email' };
+    console.error('Error in sendProjectEmail:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error occurred' 
+    };
   }
 };
 
@@ -99,6 +132,36 @@ export default function ProjectsManagement() {
       fullDescription: []
     }
   });
+
+  // Fetch projects from API on component mount
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        dispatch(setLoading(true));
+        const response = await fetch('/api/projects');
+        let data;
+        try {
+          data = await response.json();
+        } catch (jsonError) {
+          data = { error: 'Invalid response from server' };
+        }
+        
+        if (response.ok && data.success) {
+          dispatch(setProjects(data.projects));
+        } else {
+          console.error('Failed to fetch projects:', data?.error);
+          dispatch(setError(data?.error || 'Failed to fetch projects'));
+        }
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+        dispatch(setError('Failed to fetch projects'));
+      } finally {
+        dispatch(setLoading(false));
+      }
+    };
+
+    fetchProjects();
+  }, [dispatch]);
 
   const filteredProjects = projects.filter(project =>
     project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -195,9 +258,58 @@ export default function ProjectsManagement() {
     }
   }, [isModalOpen]);
 
-  const handleDelete = (projectId: string) => {
+  const handleDelete = async (projectId: string) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
-      dispatch(deleteProject(projectId));
+      try {
+        // Make API call to delete project
+        const apiResponse = await fetch(`/api/projects?id=${projectId}`, {
+          method: 'DELETE',
+        });
+
+        const apiData = await safeJsonParse(apiResponse);
+
+        if (!apiResponse.ok) {
+          throw new Error(apiData?.error || 'Failed to delete project');
+        }
+
+        // Update Redux store after successful API call
+        dispatch(deleteProject(projectId));
+        toast.success('Project deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting project:', error);
+        toast.error('Error deleting project. Please try again.');
+      }
+    }
+  };
+
+  const handleFeaturedToggle = async (project: Project) => {
+    try {
+      const updatedProject = {
+        ...project,
+        featured: !project.featured
+      };
+
+      // Make API call to update project
+      const apiResponse = await fetch('/api/projects', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedProject),
+      });
+
+      const apiData = await safeJsonParse(apiResponse);
+
+      if (!apiResponse.ok) {
+        throw new Error(apiData?.error || 'Failed to update project');
+      }
+
+      // Update Redux store after successful API call
+      dispatch(updateProject(apiData.project || updatedProject));
+      toast.success(`Project ${updatedProject.featured ? 'featured' : 'unfeatured'} successfully!`);
+    } catch (error) {
+      console.error('Error updating project:', error);
+      toast.error('Error updating project. Please try again.');
     }
   };
 
@@ -243,10 +355,26 @@ export default function ProjectsManagement() {
         // Continue with form submission even if email fails
       }
 
+      // Make API call to save/update project
+      const apiResponse = await fetch('/api/projects', {
+        method: editingProject ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(projectData),
+      });
+
+      const apiData = await safeJsonParse(apiResponse);
+
+      if (!apiResponse.ok) {
+        throw new Error(apiData?.error || 'Failed to save project');
+      }
+
+      // Update Redux store with the response from API
       if (editingProject) {
-        dispatch(updateProject(projectData));
+        dispatch(updateProject(apiData.project || projectData));
       } else {
-        dispatch(addProject(projectData));
+        dispatch(addProject(apiData.project || projectData));
       }
 
       // Clear localStorage
@@ -404,12 +532,7 @@ export default function ProjectsManagement() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <button
-                    onClick={() => {
-                      dispatch(updateProject({
-                        ...project,
-                        featured: !project.featured
-                      }));
-                    }}
+                    onClick={() => handleFeaturedToggle(project)}
                     className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 ${
                       project.featured ? 'bg-black' : 'bg-gray-200'
                     }`}

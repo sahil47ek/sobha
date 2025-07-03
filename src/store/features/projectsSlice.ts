@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Project, projects as initialProjects } from '@/data/projects';
+import { Project } from '@/data/projects';
 
 interface ProjectsState {
   projects: Project[];
@@ -7,9 +7,9 @@ interface ProjectsState {
   error: string | null;
 }
 
-// Initialize with sample projects data
+// Initialize with empty array - will be populated from API
 const initialState: ProjectsState = {
-  projects: initialProjects,
+  projects: [],
   loading: false,
   error: null,
 };
@@ -18,8 +18,14 @@ export const projectsSlice = createSlice({
   name: 'projects',
   initialState,
   reducers: {
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action: PayloadAction<string | null>) => {
+      state.error = action.payload;
+    },
     resetProjects: (state) => {
-      state.projects = initialProjects;
+      state.projects = [];
     },
     addProject: (state, action: PayloadAction<Project>) => {
       // Ensure ID is a string
@@ -52,5 +58,13 @@ export const projectsSlice = createSlice({
   },
 });
 
-export const { addProject, updateProject, deleteProject, setProjects, resetProjects } = projectsSlice.actions;
+export const { 
+  addProject, 
+  updateProject, 
+  deleteProject, 
+  setProjects, 
+  resetProjects, 
+  setLoading, 
+  setError 
+} = projectsSlice.actions;
 export default projectsSlice.reducer; 

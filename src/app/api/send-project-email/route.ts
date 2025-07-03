@@ -42,6 +42,18 @@ const formatProjectDetails = (details: ProjectDetails): string => {
 
 export async function POST(request: Request) {
   try {
+    // Check if required environment variables are set
+    const requiredEnvVars = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASSWORD', 'SMTP_FROM_EMAIL', 'ADMIN_EMAIL'];
+    const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+    
+    if (missingVars.length > 0) {
+      console.error('Missing environment variables:', missingVars);
+      return NextResponse.json(
+        { error: 'Email configuration is incomplete. Please check environment variables.' },
+        { status: 500 }
+      );
+    }
+
     const body = await request.json();
     const { subject, projectDetails } = body;
 

@@ -10,7 +10,7 @@ import { useAppSelector, useAppDispatch } from '@/store/store';
 import CustomDropdown from '@/components/CustomDropdown';
 import Navbar from '../components/Navbar';
 import { Project } from '@/data/projects';
-import { resetProjects } from '@/store/features/projectsSlice';
+import { setProjects, setLoading, setError } from '@/store/features/projectsSlice';
 
 const NavbarComponent = dynamic(() => import('../components/Navbar'), {
   ssr: false,
@@ -19,16 +19,36 @@ const NavbarComponent = dynamic(() => import('../components/Navbar'), {
 
 export default function Projects() {
   const dispatch = useAppDispatch();
-  const { projects } = useAppSelector((state) => state.projects);
+  const { projects, loading } = useAppSelector((state) => state.projects);
   const [selectedCity, setSelectedCity] = useState<string>('all');
   const [selectedType, setSelectedType] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
 
-  // Reset projects on mount
+  // Fetch projects from API on mount
   useEffect(() => {
-    dispatch(resetProjects());
+    const fetchProjects = async () => {
+      try {
+        dispatch(setLoading(true));
+        const response = await fetch('/api/projects');
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          dispatch(setProjects(data.projects));
+        } else {
+          console.error('Failed to fetch projects:', data.error);
+          dispatch(setError(data.error || 'Failed to fetch projects'));
+        }
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+        dispatch(setError('Failed to fetch projects'));
+      } finally {
+        dispatch(setLoading(false));
+      }
+    };
+
+    fetchProjects();
   }, [dispatch]);
 
   // Debug log for projects

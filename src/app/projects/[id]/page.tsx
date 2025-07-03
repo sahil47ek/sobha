@@ -6,7 +6,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { Project } from '@/data/projects';
 import { projectMedia } from '@/data/projectMedia';
 import ProjectEnquiryForm from '@/components/ProjectEnquiryForm';
-import { useAppSelector } from '@/store/store';
+import { useAppSelector, useAppDispatch } from '@/store/store';
+import { setProjects, setLoading, setError } from '@/store/features/projectsSlice';
 import Navbar from '@/app/components/Navbar';
 import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { testimonials } from '@/data/testimonials';
@@ -20,6 +21,32 @@ export default function ProjectPage() {
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [galleryOpen, setGalleryOpen] = useState(false);
   const { projects } = useAppSelector((state) => state.projects);
+  const dispatch = useAppDispatch();
+
+  // Fetch projects from API on mount
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        dispatch(setLoading(true));
+        const response = await fetch('/api/projects');
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          dispatch(setProjects(data.projects));
+        } else {
+          console.error('Failed to fetch projects:', data.error);
+          dispatch(setError(data.error || 'Failed to fetch projects'));
+        }
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+        dispatch(setError('Failed to fetch projects'));
+      } finally {
+        dispatch(setLoading(false));
+      }
+    };
+
+    fetchProjects();
+  }, [dispatch]);
 
   // Move all useEffect hooks together at the top level
   useEffect(() => {
