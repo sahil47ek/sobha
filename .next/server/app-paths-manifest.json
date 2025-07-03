@@ -3,8 +3,5 @@
   "/api/projects/route": "app/api/projects/route.js",
   "/projects/page": "app/projects/page.js",
   "/_not-found/page": "app/_not-found/page.js",
-  "/admin/projects/page": "app/admin/projects/page.js",
-  "/contact/page": "app/contact/page.js",
-  "/about/page": "app/about/page.js",
-  "/admin/leads/page": "app/admin/leads/page.js"
+  "/admin/projects/page": "app/admin/projects/page.js"
 }

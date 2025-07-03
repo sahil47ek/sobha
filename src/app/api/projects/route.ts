@@ -6,7 +6,11 @@ import { Project, projects as initialProjects } from '@/data/projects';
 
 // Ensure the projects file exists
 const ensureProjectsFile = async (): Promise<string> => {
-  const dataDir = path.join(process.cwd(), 'data');
+  // In production (Vercel), use /tmp directory which is writable
+  // NOTE: /tmp is ephemeral in serverless environments - data will be lost on function recycling
+  // For production use, consider using a proper database (PostgreSQL, MongoDB, etc.)
+  const baseDir = process.env.NODE_ENV === 'production' ? '/tmp' : process.cwd();
+  const dataDir = path.join(baseDir, 'data');
   const filePath = path.join(dataDir, 'projects.json');
 
   try {
@@ -36,16 +40,22 @@ const ensureProjectsFile = async (): Promise<string> => {
 // GET - Fetch all projects
 export async function GET() {
   try {
+    console.log('GET /api/projects - Fetching projects');
     const filePath = await ensureProjectsFile();
+    console.log('GET /api/projects - File path:', filePath);
+    
     const fileContent = await fs.promises.readFile(filePath, 'utf8');
     const projects = JSON.parse(fileContent);
+    console.log('GET /api/projects - Loaded projects count:', projects.length);
 
     return NextResponse.json({ 
       success: true, 
-      projects 
+      projects,
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV
     });
   } catch (error) {
-    console.error('Error fetching projects:', error);
+    console.error('GET /api/projects - Error fetching projects:', error);
     return NextResponse.json(
       { error: 'Failed to fetch projects' },
       { status: 500 }
@@ -58,8 +68,17 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
     
+    console.log('POST /api/projects - Received data:', { id: data.id, title: data.title });
+    
     // Validate required fields
     if (!data.title || !data.description || !data.location || !data.city || !data.price) {
+      console.error('POST /api/projects - Missing required fields:', { 
+        hasTitle: !!data.title, 
+        hasDescription: !!data.description, 
+        hasLocation: !!data.location, 
+        hasCity: !!data.city, 
+        hasPrice: !!data.price 
+      });
       return NextResponse.json(
         { error: 'Title, description, location, city, and price are required' },
         { status: 400 }
@@ -139,7 +158,10 @@ export async function PUT(request: Request) {
   try {
     const data = await request.json();
     
+    console.log('PUT /api/projects - Received data:', { id: data.id, title: data.title });
+    
     if (!data.id) {
+      console.error('PUT /api/projects - Missing project ID');
       return NextResponse.json(
         { error: 'Project ID is required' },
         { status: 400 }
@@ -147,13 +169,16 @@ export async function PUT(request: Request) {
     }
 
     const filePath = await ensureProjectsFile();
+    console.log('PUT /api/projects - File path:', filePath);
+    
     let projects = [];
     
     try {
       const fileContent = await fs.promises.readFile(filePath, 'utf8');
       projects = JSON.parse(fileContent);
+      console.log('PUT /api/projects - Loaded projects count:', projects.length);
     } catch (error) {
-      console.error('Error reading projects file:', error);
+      console.error('PUT /api/projects - Error reading projects file:', error);
       return NextResponse.json(
         { error: 'Failed to read projects' },
         { status: 500 }
@@ -161,8 +186,10 @@ export async function PUT(request: Request) {
     }
 
     const projectIndex = projects.findIndex((p: Project) => p.id === data.id);
+    console.log('PUT /api/projects - Project index found:', projectIndex);
     
     if (projectIndex === -1) {
+      console.error('PUT /api/projects - Project not found with ID:', data.id);
       return NextResponse.json(
         { error: 'Project not found' },
         { status: 404 }
@@ -176,10 +203,13 @@ export async function PUT(request: Request) {
       id: data.id // Ensure ID doesn't change
     };
 
+    console.log('PUT /api/projects - Updated project:', { id: projects[projectIndex].id, title: projects[projectIndex].title });
+
     try {
       await fs.promises.writeFile(filePath, JSON.stringify(projects, null, 2));
+      console.log('PUT /api/projects - Successfully wrote to file');
     } catch (error) {
-      console.error('Error writing to projects file:', error);
+      console.error('PUT /api/projects - Error writing to projects file:', error);
       throw new Error('Failed to update project');
     }
 
@@ -189,7 +219,7 @@ export async function PUT(request: Request) {
       project: projects[projectIndex]
     });
   } catch (error) {
-    console.error('Error updating project:', error);
+    console.error('PUT /api/projects - Error updating project:', error);
     return NextResponse.json(
       { error: 'Failed to update project' },
       { status: 500 }

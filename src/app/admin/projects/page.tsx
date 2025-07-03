@@ -364,10 +364,16 @@ export default function ProjectsManagement() {
         body: JSON.stringify(projectData),
       });
 
+      console.log('API Response status:', apiResponse.status);
+      console.log('API Response headers:', Object.fromEntries(apiResponse.headers.entries()));
+
       const apiData = await safeJsonParse(apiResponse);
+      console.log('API Response data:', apiData);
 
       if (!apiResponse.ok) {
-        throw new Error(apiData?.error || 'Failed to save project');
+        const errorMessage = apiData?.error || `HTTP ${apiResponse.status}: ${apiResponse.statusText}`;
+        console.error('API Error:', errorMessage);
+        throw new Error(errorMessage);
       }
 
       // Update Redux store with the response from API
@@ -415,9 +421,11 @@ export default function ProjectsManagement() {
       toast.error('Error saving project. Please try again.');
     } finally {
       // Reset button state
-      const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
-      submitButton.disabled = false;
-      submitButton.innerText = editingProject ? 'Update Project' : 'Add Project';
+      const submitButton = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.innerText = editingProject ? 'Update Project' : 'Add Project';
+      }
     }
   };
 
