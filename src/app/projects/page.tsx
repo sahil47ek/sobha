@@ -242,15 +242,21 @@ export default function Projects() {
             {/* Results Count */}
             <div className="mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                {filteredProjects.length} {filteredProjects.length === 1 ? 'Project' : 'Projects'} Found
+                {loading ? 'Loading...' : `${filteredProjects.length} ${filteredProjects.length === 1 ? 'Project' : 'Projects'} Found`}
               </h2>
             </div>
 
             {/* Projects Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {filteredProjects.map((project) => {
                 const media = projectMedia[project.id];
-                if (!media) return null;
+                // Use fallback image for dynamic projects
+                const projectImage = media?.mainImage || '/images/properties/neopolis-arbor-1740593910135-253900274.jpg';
 
                 return (
                   <Link
@@ -260,7 +266,7 @@ export default function Projects() {
                   >
                     <div className="relative h-48 sm:h-56 lg:h-64">
                       <Image
-                        src={media.mainImage}
+                        src={projectImage}
                         alt={project.title}
                         fill
                         className="object-cover transition-transform duration-300 group-hover:scale-110"
@@ -292,9 +298,10 @@ export default function Projects() {
                 );
               })}
             </div>
+            )}
 
             {/* No Results Message */}
-            {filteredProjects.length === 0 && (
+            {!loading && filteredProjects.length === 0 && (
               <div className="text-center py-12">
                 <h3 className="text-xl font-medium text-gray-900 mb-2">No projects found</h3>
                 <p className="text-gray-600">Try adjusting your search or filters</p>

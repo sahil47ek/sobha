@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -13,16 +13,8 @@ interface Lead {
   message?: string;
 }
 
-// Configure email transporter
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: true,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Helper function to get the leads file path
 const getLeadsFilePath = () => {
@@ -95,9 +87,9 @@ export async function POST(request: Request) {
 
     // Send notification email
     try {
-      await transporter.sendMail({
-        from: process.env.SMTP_FROM_EMAIL,
-        to: process.env.ADMIN_EMAIL,
+      await resend.emails.send({
+        from: 'Sobha Real Estate <onboarding@resend.dev>',
+        to: [process.env.ADMIN_EMAIL!],
         subject: 'Lead Deleted',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

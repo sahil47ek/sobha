@@ -4,12 +4,11 @@ import { useState, FormEvent, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { cities, projectStatus, type Project, City, ProjectStatus } from '@/data/projects';
-import { addProject, updateProject, deleteProject } from '@/store/features/projectsSlice';
+import { addProject, updateProject, deleteProject, setProjects, setLoading, setError } from '@/store/features/projectsSlice';
 import { useAppSelector } from '@/store/store';
 import { v4 as uuidv4 } from 'uuid';
 import CustomDropdown from '@/components/CustomDropdown';
 import { toast } from 'react-hot-toast';
-import { setLoading, setProjects, setError } from '@/store/features/projectsSlice';
 
 // Utility function to safely parse JSON responses
 const safeJsonParse = async (response: Response) => {
@@ -110,28 +109,7 @@ export default function ProjectsManagement() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [formData, setFormData] = useState<ProjectFormData>({
-    id: '',
-    title: '',
-    subtitle: '',
-    description: '',
-    price: '',
-    city: cities[0],
-    status: projectStatus[0],
-    location: '',
-    badges: [],
-    amenities: [],
-    features: [],
-    featured: false,
-    details: {
-      bhk: '',
-      landParcel: '',
-      units: '',
-      floors: '',
-      theme: '',
-      fullDescription: []
-    }
-  });
+  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch projects from API on component mount
   useEffect(() => {
@@ -162,6 +140,29 @@ export default function ProjectsManagement() {
 
     fetchProjects();
   }, [dispatch]);
+
+  const [formData, setFormData] = useState<ProjectFormData>({
+    id: '',
+    title: '',
+    subtitle: '',
+    description: '',
+    price: '',
+    city: cities[0],
+    status: projectStatus[0],
+    location: '',
+    badges: [],
+    amenities: [],
+    features: [],
+    featured: false,
+    details: {
+      bhk: '',
+      landParcel: '',
+      units: '',
+      floors: '',
+      theme: '',
+      fullDescription: []
+    }
+  });
 
   const filteredProjects = projects.filter(project =>
     project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

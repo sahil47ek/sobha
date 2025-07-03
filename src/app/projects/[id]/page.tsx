@@ -142,29 +142,24 @@ export default function ProjectPage() {
     );
   }
 
-  // Get static media data
-  const media = projectMedia[project.id];
-  if (!media) {
-    return (
-      <>
-        <Navbar />
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-text-primary mb-4">Media Not Found</h1>
-            <p className="text-text-light">The media for this project is not available.</p>
-            <div className="mt-6">
-              <button
-                onClick={() => router.push('/projects')}
-                className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-              >
-                Back to Projects
-              </button>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
+  // Get static media data or create fallback for dynamic projects
+  const staticMedia = projectMedia[project.id];
+  
+  // Create fallback media for dynamic projects
+  const fallbackMedia = {
+    id: project.id,
+    mainImage: '/images/properties/neopolis-arbor-1740593910135-253900274.jpg', // Default image
+    gallery: [
+      '/images/properties/neopolis-arbor-1740593910135-253900274.jpg',
+      '/images/properties/neopolis-arbor-1740593910139-437855357.jpg',
+      '/images/properties/Neopolis-family-room-1740605825453-711895611.jpg',
+      '/images/properties/Neopolis-family-room-1740605825456-551111610.jpg',
+      '/images/properties/Neopolis-kitchen-1740594803998-70983112.jpg'
+    ]
+  };
+
+  // Use static media if available, otherwise use fallback
+  const media = staticMedia || fallbackMedia;
 
   // Ensure all required arrays exist with fallbacks
   const projectGallery = media.gallery || [];

@@ -1,20 +1,12 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 interface ProjectDetails {
   [key: string]: string | number | boolean | ProjectDetails;
 }
 
-// Configure email transporter
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: true,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Format project details into HTML
 const formatProjectDetails = (details: ProjectDetails): string => {
@@ -43,7 +35,7 @@ const formatProjectDetails = (details: ProjectDetails): string => {
 export async function POST(request: Request) {
   try {
     // Check if required environment variables are set
-    const requiredEnvVars = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASSWORD', 'SMTP_FROM_EMAIL', 'ADMIN_EMAIL'];
+    const requiredEnvVars = ['RESEND_API_KEY', 'ADMIN_EMAIL'];
     const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
     
     if (missingVars.length > 0) {
@@ -68,9 +60,9 @@ export async function POST(request: Request) {
     `;
 
     // Send email
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM_EMAIL,
-      to: process.env.ADMIN_EMAIL,
+    await resend.emails.send({
+      from: 'Sobha Real Estate <onboarding@resend.dev>',
+      to: [process.env.ADMIN_EMAIL!],
       subject: subject,
       html: htmlContent,
     });

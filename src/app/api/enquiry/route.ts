@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import path from 'path';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 interface Lead {
   id: string;
@@ -18,14 +18,8 @@ interface Lead {
   status: string;
 }
 
-// Configure email transporter
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'sahil.ek@gmail.com',
-    pass: process.env.GMAIL_APP_PASSWORD // You'll need to set this up
-  }
-});
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Helper function to get the leads file path
 const getLeadsFilePath = () => {
@@ -167,9 +161,9 @@ export async function POST(request: Request) {
         </div>
       `;
 
-      await transporter.sendMail({
-        from: 'Sobha Real Estate <sahil.ek@gmail.com>',
-        to: 'sahil.ek@gmail.com',
+      await resend.emails.send({
+        from: 'Sobha Real Estate <onboarding@resend.dev>',
+        to: ['sahil.ek@gmail.com'],
         subject: 'New Lead from Contact Form',
         html: emailHtml,
       });
