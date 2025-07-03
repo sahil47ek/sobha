@@ -13,8 +13,8 @@ interface Lead {
   message?: string;
 }
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if API key is available
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Helper function to get the leads file path
 const getLeadsFilePath = () => {
@@ -87,40 +87,44 @@ export async function POST(request: Request) {
 
     // Send notification email
     try {
-      await resend.emails.send({
-        from: 'Sobha Real Estate <onboarding@resend.dev>',
-        to: [process.env.ADMIN_EMAIL!],
-        subject: 'Lead Deleted',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #333;">Lead Deletion Notification</h2>
-            <p>The following lead has been deleted from the system:</p>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-              <tr>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Name:</strong></td>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${leadData.name}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Email:</strong></td>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${leadData.email}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Phone:</strong></td>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${leadData.phone}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Property Interest:</strong></td>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${leadData.propertyInterest}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Status:</strong></td>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${leadData.status}</td>
-              </tr>
-            </table>
-            <p style="color: #666; margin-top: 20px;">This is an automated notification.</p>
-          </div>
-        `,
-      });
+      if (resend) {
+        await resend.emails.send({
+          from: 'Sobha Real Estate <onboarding@resend.dev>',
+          to: [process.env.ADMIN_EMAIL!],
+          subject: 'Lead Deleted',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #333;">Lead Deletion Notification</h2>
+              <p>The following lead has been deleted from the system:</p>
+              <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <tr>
+                  <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Name:</strong></td>
+                  <td style="padding: 8px; border-bottom: 1px solid #ddd;">${leadData.name}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Email:</strong></td>
+                  <td style="padding: 8px; border-bottom: 1px solid #ddd;">${leadData.email}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Phone:</strong></td>
+                  <td style="padding: 8px; border-bottom: 1px solid #ddd;">${leadData.phone}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Property Interest:</strong></td>
+                  <td style="padding: 8px; border-bottom: 1px solid #ddd;">${leadData.propertyInterest}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Status:</strong></td>
+                  <td style="padding: 8px; border-bottom: 1px solid #ddd;">${leadData.status}</td>
+                </tr>
+              </table>
+              <p style="color: #666; margin-top: 20px;">This is an automated notification.</p>
+            </div>
+          `,
+        });
+      } else {
+        console.log('Resend API key not configured, skipping email notification');
+      }
     } catch (error) {
       console.error('Error sending email notification:', error);
       // Continue with the deletion even if email fails

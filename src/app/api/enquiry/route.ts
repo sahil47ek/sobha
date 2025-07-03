@@ -18,8 +18,8 @@ interface Lead {
   status: string;
 }
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if API key is available
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Helper function to get the leads file path
 const getLeadsFilePath = () => {
@@ -129,46 +129,50 @@ export async function POST(request: Request) {
 
     // Send email notification
     try {
-      const emailHtml = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">New Lead Details</h2>
-          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-            <tr>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Name:</strong></td>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.name}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Email:</strong></td>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.email}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Phone:</strong></td>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.phone}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Property Interest:</strong></td>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.propertyInterest}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Message:</strong></td>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.message}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Date:</strong></td>
-              <td style="padding: 8px; border-bottom: 1px solid #ddd;">${new Date().toLocaleString()}</td>
-            </tr>
-          </table>
-        </div>
-      `;
+      if (resend) {
+        const emailHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">New Lead Details</h2>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Name:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.name}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Email:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.email}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Phone:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.phone}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Property Interest:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.propertyInterest}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Message:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.message}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Date:</strong></td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">${new Date().toLocaleString()}</td>
+              </tr>
+            </table>
+          </div>
+        `;
 
-      await resend.emails.send({
-        from: 'Sobha Real Estate <onboarding@resend.dev>',
-        to: ['sahil.ek@gmail.com'],
-        subject: 'New Lead from Contact Form',
-        html: emailHtml,
-      });
+        await resend.emails.send({
+          from: 'Sobha Real Estate <onboarding@resend.dev>',
+          to: ['sahil.ek@gmail.com'],
+          subject: 'New Lead from Contact Form',
+          html: emailHtml,
+        });
 
-      console.log('Email notification sent successfully');
+        console.log('Email notification sent successfully');
+      } else {
+        console.log('Resend API key not configured, skipping email notification');
+      }
     } catch (emailError) {
       console.error('Error sending email notification:', emailError);
       // Continue with the submission even if email fails

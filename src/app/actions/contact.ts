@@ -9,12 +9,15 @@ interface ContactFormData {
   message: string;
 }
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if API key is available
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 
 export async function submitContactForm(data: ContactFormData) {
   try {
     if (!ADMIN_EMAIL) throw new Error('ADMIN_EMAIL env variable not set');
+    if (!resend) throw new Error('Resend API key not configured');
+    
     // Send email via Resend
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -50,6 +53,8 @@ export async function submitContactForm(data: ContactFormData) {
 export async function sendContactForm(formData: FormData) {
   try {
     if (!ADMIN_EMAIL) throw new Error('ADMIN_EMAIL env variable not set');
+    if (!resend) throw new Error('Resend API key not configured');
+    
     // Process form data here
     const name = formData.get('name') as string;
     const email = formData.get('email') as string;

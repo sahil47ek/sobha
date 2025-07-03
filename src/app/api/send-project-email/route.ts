@@ -5,8 +5,8 @@ interface ProjectDetails {
   [key: string]: string | number | boolean | ProjectDetails;
 }
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if API key is available
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Format project details into HTML
 const formatProjectDetails = (details: ProjectDetails): string => {
@@ -35,13 +35,21 @@ const formatProjectDetails = (details: ProjectDetails): string => {
 export async function POST(request: Request) {
   try {
     // Check if required environment variables are set
-    const requiredEnvVars = ['RESEND_API_KEY', 'ADMIN_EMAIL'];
+    const requiredEnvVars = ['ADMIN_EMAIL'];
     const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
     
     if (missingVars.length > 0) {
       console.error('Missing environment variables:', missingVars);
       return NextResponse.json(
         { error: 'Email configuration is incomplete. Please check environment variables.' },
+        { status: 500 }
+      );
+    }
+
+    if (!resend) {
+      console.error('Resend API key not configured');
+      return NextResponse.json(
+        { error: 'Email service not configured' },
         { status: 500 }
       );
     }
