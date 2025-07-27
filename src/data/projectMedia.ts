@@ -93,7 +93,7 @@ export const projectMedia: Record<string, ProjectMedia> = {
   'sobha-townpark': {
     id: 'sobha-townpark',
     mainImage: '/images/projects/townpark/1.jpg',
-    embedVideo: 'https://www.youtube.com/embed/7tYW1QHb1kA?list=TLGGAsAwhkh0BooxNTA0MjAyNQ&autoplay=1&mute=1&loop=1&playlist=7tYW1QHb1kA&controls=0&showinfo=0&rel=0',
+    videoUrl: '/images/projects/townpark/townpark.mp4',
     gallery: [
       '/images/projects/townpark/1.jpg',
       '/images/projects/townpark/2.jpg',

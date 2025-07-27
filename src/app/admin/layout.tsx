@@ -9,7 +9,6 @@ import { setAuthenticated } from '@/store/features/adminSlice';
 import Cookies from 'js-cookie';
 import { 
   HomeIcon, 
-  BuildingOfficeIcon, 
   UserGroupIcon,
   Cog6ToothIcon,
   ArrowLeftOnRectangleIcon
@@ -18,7 +17,6 @@ import {
 const menuItems = [
   { name: 'Dashboard', href: '/admin', icon: HomeIcon },
   { name: 'Leads', href: '/admin/leads', icon: UserGroupIcon },
-  { name: 'Projects', href: '/admin/projects', icon: BuildingOfficeIcon },
   { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },
 ];
 

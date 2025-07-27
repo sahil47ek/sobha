@@ -1,36 +1,156 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sobha Real Estate Website
+
+A modern, responsive real estate website built with Next.js 15, TypeScript, and Tailwind CSS.
+
+## Features
+
+- **Static Project Management**: All projects are hardcoded in `src/data/projects.ts`
+- **Responsive Design**: Mobile-first approach with Tailwind CSS
+- **Modern UI/UX**: Clean, professional design with smooth animations
+- **SEO Optimized**: Built-in SEO features with Next.js
+- **Performance**: Optimized images and fast loading times
+- **Contact Management**: Admin panel for managing leads and enquiries
+- **WhatsApp Integration**: Direct WhatsApp contact functionality
+
+## Project Structure
+
+```
+sobha/
+├── src/
+│   ├── app/
+│   │   ├── admin/           # Admin panel (leads management only)
+│   │   ├── components/      # Reusable UI components
+│   │   ├── projects/        # Project listing and detail pages
+│   │   └── ...
+│   ├── data/
+│   │   ├── projects.ts      # Static project data
+│   │   ├── projectMedia.ts  # Project images and media
+│   │   └── testimonials.ts  # Customer testimonials
+│   └── ...
+├── public/
+│   └── images/              # Static images and project media
+└── ...
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd sobha
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Run the development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Learn More
+## Project Management
 
-To learn more about Next.js, take a look at the following resources:
+### Adding/Editing Projects
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Projects are managed statically in `src/data/projects.ts`. To add or edit projects:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Open `src/data/projects.ts`
+2. Add new project objects to the `projects` array
+3. Update project media in `src/data/projectMedia.ts`
+4. Add project images to `public/images/projects/[project-id]/`
 
-## Deploy on Vercel
+### Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Each project follows this structure:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```typescript
+{
+  id: 'unique-project-id',
+  title: 'Project Title',
+  subtitle: 'Project Subtitle',
+  description: 'Detailed project description',
+  location: 'Project Location',
+  city: 'City Name',
+  price: '₹ Price Range',
+  specs: 'Property Specifications',
+  badges: ['Badge 1', 'Badge 2'],
+  amenities: ['Amenity 1', 'Amenity 2'],
+  features: ['Feature 1', 'Feature 2'],
+  featured: true/false,
+  status: 'Under Construction',
+  details: {
+    bhk: 'BHK Details',
+    landParcel: 'Land Area',
+    units: 'Number of Units',
+    floors: 'Floor Details',
+    theme: 'Project Theme',
+    fullDescription: ['Description 1', 'Description 2']
+  }
+}
+```
+
+## Admin Panel
+
+The admin panel is accessible at `/admin` and includes:
+
+- **Dashboard**: Overview of leads and enquiries
+- **Leads Management**: View and manage customer enquiries
+- **Settings**: Admin configuration
+
+### Admin Access
+
+To access the admin panel, you'll need to implement authentication. Currently, the admin routes are publicly accessible.
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Deploy automatically
+
+### Other Platforms
+
+The application can be deployed to any platform that supports Next.js:
+
+- Netlify
+- Railway
+- DigitalOcean App Platform
+- AWS Amplify
+
+## Technologies Used
+
+- **Framework**: Next.js 15
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Icons**: Heroicons
+- **State Management**: Redux Toolkit (for admin features)
+- **Forms**: React Hook Form
+- **Notifications**: React Hot Toast
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
+
+## Support
+
+For support or questions, please contact the development team.

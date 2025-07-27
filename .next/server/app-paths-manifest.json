@@ -1,11 +1,9 @@
 {
-  "/api/send-project-email/route": "app/api/send-project-email/route.js",
-  "/api/projects/route": "app/api/projects/route.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/api/leads/route": "app/api/leads/route.js",
   "/projects/page": "app/projects/page.js",
   "/_not-found/page": "app/_not-found/page.js",
   "/projects/[id]/page": "app/projects/[id]/page.js",
-  "/admin/projects/page": "app/admin/projects/page.js",
+  "/page": "app/page.js",
+  "/admin/page": "app/admin/page.js",
   "/admin/leads/page": "app/admin/leads/page.js"
 }

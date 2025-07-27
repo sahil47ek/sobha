@@ -2,14 +2,15 @@
   {
     "id": "sobha-townpark",
     "title": "Sobha Townpark",
-    "subtitle": "New York Inspired Living",
-    "description": "Vibrant and suave, challenging yet inspiring, New York is a city of possibilities. Living here is a statement – the one that differentiates you. The lifestyle you have always admired and desired for is coming closer to you. SOBHA presents Bengaluru's first-ever, self-sufficient residential township crafted in the architectural footsteps of New York. Come, bask in its sparkle and stride to the future with aplomb. Located near Electronic City in South Bengaluru, brimming with potential to be the next hub, these iconic residences will usher you into a world of unparalleled luxury.",
-    "location": "Hosur Road",
+    "subtitle": "New York - Themed Luxury Apartments",
+    "description": "Welcome to the newest phase of SOBHA Townpark - Bengaluru’s one and only New York-themed township. Located on Hosur Road near Electronic City, these modern homes are surrounded by world-class amenities for all age groups. Live in a vibrant, stylish community that brings the energy of NYC right to your doorstep. It’s a lifestyle like no other - exciting, exclusive, and full of life, every single day.",
+    "location": "Near Electronic City, Bengaluru",
     "city": "Bangalore",
-    "price": "₹ 91L*",
-    "specs": "1/2/3/4 BHK",
+    "price": "₹1.5 Cr Onwards",
+    "specs": "1, 2, 2.5, 3, 3.5, 4 & 4.5 BHK",
     "badges": [
-      "Under Construction"
+      "Under Construction",
+      "New York Theme"
     ],
     "amenities": [
       "Swimming Pool",
@@ -38,33 +39,31 @@
     "featured": true,
     "status": "Under Construction",
     "details": {
-      "bhk": "1/2/3/4 BHK",
+      "bhk": "1, 2, 2.5, 3, 3.5, 4 & 4.5 BHK",
       "landParcel": "33 Acres",
-      "units": "2000+",
+      "units": "2104",
       "floors": "1B + G + 44",
-      "theme": "New York Inspired Living",
+      "theme": "New York - Themed Luxury Apartments",
       "fullDescription": [
-        "Vibrant and suave, challenging yet inspiring, New York is a city of possibilities.",
-        "Living here is a statement – the one that differentiates you.",
-        "The lifestyle you have always admired and desired for is coming closer to you.",
-        "SOBHA presents Bengaluru's first-ever, self-sufficient residential township crafted in the architectural footsteps of New York.",
-        "Come, bask in its sparkle and stride to the future with aplomb.",
-        "Located near Electronic City in South Bengaluru, brimming with potential to be the next hub, these iconic residences will usher you into a world of unparalleled luxury."
+        "Welcome to the newest phase of SOBHA Townpark - Bengaluru's one and only New York-themed township.",
+        "Located on Hosur Road near Electronic City, these modern homes are surrounded by world-class amenities for all age groups.",
+        "Live in a vibrant, stylish community that brings the energy of NYC right to your doorstep.",
+        "It's a lifestyle like no other - exciting, exclusive, and full of life, every single day."
       ]
     }
   },
   {
     "id": "sobha-neopolis",
     "title": "Sobha Neopolis",
-    "subtitle": "Modern Urban Living",
-    "description": "Premium 2 & 3 BHK apartments with world-class amenities in a prime location.",
-    "location": "Panathur Road, Bangalore",
-    "city": "bangalore",
-    "price": "₹1.2 Cr*",
-    "specs": "2 & 3 BHK",
+    "subtitle": "Greek-Themed Luxury Apartments",
+    "description": "Step into SOBHA Neopolis, a stunning Greek-themed township near Panathur, just off Marathahalli – ORR. Inspired by timeless Grecian architecture, these luxury homes are designed for all age groups and offer everything you need for a modern lifestyle. With world-class amenities and beautiful surroundings, living here feels like a Mediterranean holiday every day.",
+    "location": "Panathur, Off Marathahalli-ORR, Bengaluru",
+    "city": "Bangalore",
+    "price": "₹95Lakhs Onwards",
+    "specs": "1, 3, 3.5 & 4 BHK",
     "badges": [
-      "Premium",
-      "Ready to Move"
+      "Under Construction",
+      "Greek Theme"
     ],
     "amenities": [
       "Swimming Pool",
@@ -74,7 +73,10 @@
       "Indoor Games",
       "Landscaped Gardens",
       "Jogging Track",
-      "Tennis Court"
+      "Tennis Court",
+      "Amphitheatre",
+      "Yoga Deck",
+      "Meditation Zone"
     ],
     "features": [
       "Premium Flooring",
@@ -82,35 +84,37 @@
       "High-end Fixtures",
       "Smart Home Features",
       "Spacious Balconies",
-      "Ample Parking"
+      "Ample Parking",
+      "High-speed Elevators",
+      "24/7 Security"
     ],
     "featured": true,
-    "status": "Ready to Move",
+    "status": "Under Construction",
     "details": {
-      "bhk": "2 & 3 BHK",
-      "landParcel": "5 Acres",
-      "units": "250",
-      "floors": "G + 25",
-      "theme": "Modern Urban Living",
+      "bhk": "1, 3, 3.5 & 4 BHK",
+      "landParcel": "25 Acres",
+      "units": "1875",
+      "floors": "2B + G + 18",
+      "theme": "Greek-Themed Luxury Apartments",
       "fullDescription": [
-        "Experience modern urban living at Sobha Neopolis.",
-        "Located in the heart of Bangalore's IT corridor.",
-        "Premium amenities and thoughtfully designed spaces for a comfortable lifestyle."
+        "Step into SOBHA Neopolis, a stunning Greek-themed township near Panathur, just off Marathahalli – ORR.",
+        "Inspired by timeless Grecian architecture, these luxury homes are designed for all age groups and offer everything you need for a modern lifestyle.",
+        "With world-class amenities and beautiful surroundings, living here feels like a Mediterranean holiday every day."
       ]
     }
   },
   {
     "id": "sobha-infinia",
     "title": "Sobha Infinia",
-    "subtitle": "Luxury Redefined",
-    "description": "Ultra-luxury 3 & 4 BHK apartments with premium amenities and stunning views.",
-    "location": "Outer Ring Road, Bangalore",
-    "city": "bangalore",
-    "price": "₹2.8 Cr*",
-    "specs": "3 & 4 BHK",
+    "subtitle": "Ultra-luxe Abodes",
+    "description": "Step into SOBHA Infinia, where stunning architecture and modern style come together. These iconic apartments are thoughtfully designed with a clean, minimalist look that feels both elegant and smart. Every detail reflects contemporary living at its finest – stylish, comfortable, and truly sophisticated.",
+    "location": "Koramangala, Bengaluru",
+    "city": "Bangalore",
+    "price": "₹3.85 Cr Onwards",
+    "specs": "3, 3.5, 4, 4.5 BHK",
     "badges": [
-      "Ultra Luxury",
-      "Under Construction"
+      "Under Construction",
+      "Ultra Luxury"
     ],
     "amenities": [
       "Infinity Pool",
@@ -133,30 +137,31 @@
     "featured": true,
     "status": "Under Construction",
     "details": {
-      "bhk": "3 & 4 BHK",
-      "landParcel": "8 Acres",
-      "units": "180",
-      "floors": "G + 30",
-      "theme": "Luxury Living",
+      "bhk": "3, 3.5, 4, 4.5 BHK",
+      "landParcel": "4.7 acres",
+      "units": "196",
+      "floors": "G + 13",
+      "theme": "Ultra-luxe Abodes",
       "fullDescription": [
-        "Sobha Infinia represents the pinnacle of luxury living.",
-        "Stunning views of the city skyline from every apartment.",
-        "World-class amenities and unparalleled luxury in every detail."
+        "Step into SOBHA Infinia, where stunning architecture and modern style come together.",
+        "These iconic apartments are thoughtfully designed with a clean, minimalist look that feels both elegant and smart.",
+        "Every detail reflects contemporary living at its finest – stylish, comfortable, and truly sophisticated."
       ]
     }
   },
   {
     "id": "sobha-galera",
     "title": "Sobha Galera",
-    "subtitle": "Exclusive Villa Living",
-    "description": "Premium villas with private gardens and exclusive amenities.",
-    "location": "Sarjapur Road, Bangalore",
-    "city": "bangalore",
-    "price": "₹4.5 Cr*",
-    "specs": "4 BHK Villas",
+    "subtitle": "Timeless Spanish Homes",
+    "description": "Inspired by the scenic town of Galera and classic Spanish architecture, SOBHA Galera offers a unique and luxurious lifestyle. These peaceful row houses are set in a quiet yet well-connected location, designed for those who appreciate privacy and elegance. Live in a beautifully crafted home made for the select few who want something truly special.",
+    "location": "Near Kannamangala, Bengaluru",
+    "city": "Bangalore",
+    "price": "₹4.51 Cr Onwards",
+    "specs": "4 BHK",
     "badges": [
-      "Premium Villas",
-      "Limited Edition"
+      "Under Construction",
+      "Spanish Theme",
+      "Row Houses"
     ],
     "amenities": [
       "Private Pool Option",
@@ -180,29 +185,30 @@
     "status": "Under Construction",
     "details": {
       "bhk": "4 BHK",
-      "landParcel": "15 Acres",
-      "units": "100",
+      "landParcel": "4.08 Acres",
+      "units": "40",
       "floors": "G + 2",
-      "theme": "Villa Living",
+      "theme": "Timeless Spanish Homes",
       "fullDescription": [
-        "Experience exclusive villa living at Sobha Galera.",
-        "Spacious villas with private gardens in a gated community.",
-        "Premium amenities and luxurious features for an elevated lifestyle."
+        "Inspired by the scenic town of Galera and classic Spanish architecture, SOBHA Galera offers a unique and luxurious lifestyle.",
+        "These peaceful row houses are set in a quiet yet well-connected location, designed for those who appreciate privacy and elegance.",
+        "Live in a beautifully crafted home made for the select few who want something truly special."
       ]
     }
   },
   {
     "id": "sobha-ayana",
     "title": "Sobha Ayana",
-    "subtitle": "Nature-inspired Living",
-    "description": "Premium apartments surrounded by nature with modern amenities.",
-    "location": "Whitefield, Bangalore",
-    "city": "bangalore",
-    "price": "₹1.8 Cr*",
-    "specs": "2 & 3 BHK",
+    "subtitle": "Modern Tropical Apartments",
+    "description": "Welcome to SOBHA Ayana, where city life meets the calm of nature. Spread across 81 acres within SOBHA Dream Acres, this beautiful community offers modern homes surrounded by greenery and peace. With over 100 top-class amenities, contemporary design, and lush open spaces, SOBHA Ayana is perfect for those who want a calm, nature-filled lifestyle without leaving the city behind.",
+    "location": "Panathur, Off Marathahalli-ORR, Bengaluru",
+    "city": "Bangalore",
+    "price": "₹2.15 Cr Onwards",
+    "specs": "3 BHK",
     "badges": [
-      "Premium",
-      "Green Living"
+      "Under Construction",
+      "Tropical Theme",
+      "Nature Living"
     ],
     "amenities": [
       "Organic Garden",
@@ -225,67 +231,63 @@
     "featured": true,
     "status": "Under Construction",
     "details": {
-      "bhk": "2 & 3 BHK",
-      "landParcel": "10 Acres",
-      "units": "300",
-      "floors": "G + 20",
-      "theme": "Nature Living",
+      "bhk": "3 BHK",
+      "landParcel": "6.28 Acres",
+      "units": "683",
+      "floors": "G + 14",
+      "theme": "Modern Tropical Apartments",
       "fullDescription": [
-        "Sobha Ayana offers a perfect blend of nature and modern living.",
-        "Thoughtfully designed spaces that bring you closer to nature.",
-        "Premium amenities focused on wellness and sustainable living."
+        "Welcome to SOBHA Ayana, where city life meets the calm of nature.",
+        "Spread across 81 acres within SOBHA Dream Acres, this beautiful community offers modern homes surrounded by greenery and peace.",
+        "With over 100 top-class amenities, contemporary design, and lush open spaces, SOBHA Ayana is perfect for those who want a calm, nature-filled lifestyle without leaving the city behind."
       ]
     }
   },
   {
     "id": "sobha-crystal-meadows",
     "title": "Sobha Crystal Meadows",
-    "subtitle": "Luxury Living in Nature",
-    "description": "Premium 3 & 4 BHK apartments with world-class amenities surrounded by lush greenery.",
-    "location": "Whitefield Extension, Bangalore",
-    "city": "bangalore",
-    "price": "₹1.8 Cr*",
-    "specs": "3 & 4 BHK",
+    "subtitle": "Grand Quadruplex Row Houses",
+    "description": "Experience a life of luxury at SOBHA Crystal Meadows, Bengaluru's first Millionaires' Row. These grand villas feature elegant Victorian architecture, beautiful stone exteriors, large glass windows, spacious terraces, and private gardens. Every home is designed for comfort, style, and exclusivity. Join a community of high achievers and enjoy a lifestyle that's truly one of a kind.",
+    "location": "Off Sarjapur Road, Bengaluru",
+    "city": "Bangalore",
+    "price": "₹7.95 Cr Onwards",
+    "specs": "4 & 5 BHK",
     "badges": [
-      "Premium",
       "Under Construction",
-      "Green Living"
+      "Victorian Theme",
+      "Millionaires' Row"
     ],
     "amenities": [
-      "Swimming Pool",
-      "Clubhouse",
-      "Gym",
-      "Children's Play Area",
-      "Indoor Games",
-      "Landscaped Gardens",
-      "Jogging Track",
+      "Private Pool",
+      "Premium Clubhouse",
       "Tennis Court",
-      "Yoga Deck",
-      "Meditation Zone"
+      "Mini Theatre",
+      "Landscaped Parks",
+      "Walking Trail",
+      "BBQ Area",
+      "Kids Play Zone"
     ],
     "features": [
-      "Premium Flooring",
-      "Modular Kitchen",
-      "High-end Fixtures",
-      "Smart Home Features",
-      "Spacious Balconies",
-      "Ample Parking",
-      "Large Windows",
-      "Cross Ventilation"
+      "Private Garden",
+      "Victorian Architecture",
+      "Stone Exteriors",
+      "Large Glass Windows",
+      "Spacious Terraces",
+      "Multiple Parking"
     ],
     "featured": true,
     "status": "Under Construction",
     "details": {
-      "bhk": "3 & 4 BHK",
-      "landParcel": "12 Acres",
-      "units": "450",
-      "floors": "G + 25",
-      "theme": "Nature-inspired Luxury Living",
+      "bhk": "4 & 5 BHK",
+      "landParcel": "26 Acres",
+      "units": "290",
+      "floors": "G + 2",
+      "theme": "Grand Quadruplex Row Houses",
       "fullDescription": [
-        "Welcome to Sobha Crystal Meadows, where luxury meets nature.",
-        "Located in the prime area of Whitefield Extension, Bangalore.",
-        "Premium amenities and thoughtfully designed spaces for an elevated lifestyle.",
-        "Surrounded by lush greenery and offering stunning views."
+        "Experience a life of luxury at SOBHA Crystal Meadows, Bengaluru's first Millionaires' Row.",
+        "These grand villas feature elegant Victorian architecture, beautiful stone exteriors, large glass windows, spacious terraces, and private gardens.",
+        "Every home is designed for comfort, style, and exclusivity.",
+        "Join a community of high achievers and enjoy a lifestyle that's truly one of a kind."
       ]
     }
   }

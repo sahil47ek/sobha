@@ -7,12 +7,11 @@ import VideoBanner from './components/VideoBanner';
 import HomeHeroSlider from './components/HomeHeroSlider';
 import FeaturedPropertiesSlider from './components/FeaturedPropertiesSlider';
 import { useMemo, useState, useEffect } from 'react';
-import { useAppSelector, useAppDispatch } from '@/store/store';
-import { setProjects, setLoading, setError } from '@/store/features/projectsSlice';
 import { toast } from 'react-hot-toast';
 import CustomDropdown from '@/components/CustomDropdown';
 import { testimonials } from '@/data/testimonials';
 import TestimonialsSlider from './components/TestimonialsSlider';
+import { projects } from '@/data/projects';
 
 const propertyOptions = [
   { value: 'Luxury Apartments', label: 'Luxury Apartments' },
@@ -22,8 +21,6 @@ const propertyOptions = [
 ];
 
 export default function Home() {
-  const allProjects = useAppSelector((state) => state.projects.projects);
-  const dispatch = useAppDispatch();
   const [showPopup, setShowPopup] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -34,43 +31,9 @@ export default function Home() {
     message: ''
   });
 
-  // Fetch projects from API on mount
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        dispatch(setLoading(true));
-        const response = await fetch('/api/projects');
-        const data = await response.json();
-        
-        if (response.ok && data.success) {
-          dispatch(setProjects(data.projects));
-        } else {
-          console.error('Failed to fetch projects:', data.error);
-          dispatch(setError(data.error || 'Failed to fetch projects'));
-        }
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-        dispatch(setError('Failed to fetch projects'));
-      } finally {
-        dispatch(setLoading(false));
-      }
-    };
-
-    fetchProjects();
-  }, [dispatch]);
-
   const featuredProperties = useMemo(() => {
-    return allProjects
-      .map(project => ({
-        id: project.id,
-        title: project.title,
-        price: project.price,
-        location: project.location,
-        specs: project.specs,
-        image: project.image,
-        badges: project.badges
-      }));
-  }, [allProjects]);
+    return projects.filter(project => project.featured);
+  }, []);
 
   useEffect(() => {
     // Show popup after a short delay

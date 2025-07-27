@@ -3,11 +3,9 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { Project } from '@/data/projects';
+import { Project, projects } from '@/data/projects';
 import { projectMedia } from '@/data/projectMedia';
 import ProjectEnquiryForm from '@/components/ProjectEnquiryForm';
-import { useAppSelector, useAppDispatch } from '@/store/store';
-import { setProjects, setLoading, setError } from '@/store/features/projectsSlice';
 import Navbar from '@/app/components/Navbar';
 import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { testimonials } from '@/data/testimonials';
@@ -20,45 +18,11 @@ export default function ProjectPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [galleryOpen, setGalleryOpen] = useState(false);
-  const { projects } = useAppSelector((state) => state.projects);
-  const dispatch = useAppDispatch();
 
-  // Fetch projects from API on mount
+  // Find project from static data
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        dispatch(setLoading(true));
-        const response = await fetch('/api/projects');
-        const data = await response.json();
-        
-        if (response.ok && data.success) {
-          dispatch(setProjects(data.projects));
-        } else {
-          console.error('Failed to fetch projects:', data.error);
-          dispatch(setError(data.error || 'Failed to fetch projects'));
-        }
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-        dispatch(setError('Failed to fetch projects'));
-      } finally {
-        dispatch(setLoading(false));
-      }
-    };
-
-    fetchProjects();
-  }, [dispatch]);
-
-  // Move all useEffect hooks together at the top level
-  useEffect(() => {
-    // Debug logs
-    console.log('Current URL params:', params);
-    console.log('Looking for project with ID:', projectId);
-    console.log('Available projects in store:', projects);
-
-    if (projectId && projects.length > 0) {
-      const foundProject = projects.find(p => p.id.toString() === projectId.toString());
-      console.log('Found project:', foundProject);
-
+    if (projectId) {
+      const foundProject = projects.find(p => p.id === projectId);
       if (foundProject) {
         setProject(foundProject);
         // Set the initial selected image to the main project image from static media
@@ -68,7 +32,7 @@ export default function ProjectPage() {
         }
       }
     }
-  }, [projectId, projects, params]);
+  }, [projectId]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -104,7 +68,7 @@ export default function ProjectPage() {
   };
 
   // Add loading state
-  if (!projectId || !projects.length) {
+  if (!projectId) {
     return (
       <>
         <Navbar />

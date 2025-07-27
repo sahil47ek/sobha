@@ -13,7 +13,6 @@ import {
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: HomeIcon },
   { name: 'Products', href: '/admin/products', icon: SwatchIcon },
-  { name: 'Projects', href: '/admin/projects', icon: UserGroupIcon },
   { name: 'Leads', href: '/admin/leads', icon: ShoppingBagIcon },
   { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },
 ];

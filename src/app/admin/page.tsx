@@ -2,24 +2,15 @@
 
 import Link from 'next/link';
 import { 
-  BuildingOfficeIcon, 
   UserGroupIcon,
   CurrencyRupeeIcon
 } from '@heroicons/react/24/outline';
 import { useAppSelector } from '@/store/store';
 
 export default function AdminDashboard() {
-  const projects = useAppSelector((state) => state.projects.projects);
   const leads = useAppSelector((state) => state.leads.leads);
   
   const stats = [
-    {
-      name: 'Total Projects',
-      value: projects.length,
-      icon: BuildingOfficeIcon,
-      href: '/admin/projects',
-      color: 'bg-blue-500'
-    },
     {
       name: 'Total Leads',
       value: leads.length,
@@ -28,25 +19,13 @@ export default function AdminDashboard() {
       color: 'bg-green-500'
     },
     {
-      name: 'New Leads',
-      value: leads.filter(lead => lead.status === 'new').length,
+      name: 'Contact Form Leads',
+      value: leads.filter(lead => lead.source === 'Contact Form').length,
       icon: UserGroupIcon,
       href: '/admin/leads',
       color: 'bg-yellow-500'
-    },
-    {
-      name: 'Ready to Move',
-      value: projects.filter(p => p.badges.includes('Ready to Move')).length,
-      icon: CurrencyRupeeIcon,
-      href: '/admin/projects',
-      color: 'bg-purple-500'
     }
   ];
-
-  // Sort projects by most recently added
-  const recentProjects = [...projects]
-    .sort((a, b) => b.id.localeCompare(a.id))
-    .slice(0, 5);
 
   return (
     <div>
@@ -58,7 +37,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {stats.map((stat) => (
           <Link
             key={stat.name}
@@ -78,12 +57,12 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Recent Projects */}
+      {/* Recent Leads */}
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Projects</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Recent Leads</h2>
           <Link 
-            href="/admin/projects"
+            href="/admin/leads"
             className="text-sm text-primary hover:text-primary-dark"
           >
             View all
@@ -94,57 +73,43 @@ export default function AdminDashboard() {
             <thead>
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Project
+                  Name
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Location
+                  Email
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  Phone
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Price
+                  Source
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {recentProjects.map((project) => (
-                <tr key={project.id} className="hover:bg-gray-50">
+              {leads.slice(0, 5).map((lead) => (
+                <tr key={lead.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 flex-shrink-0">
-                        <img
-                          className="h-10 w-10 rounded-lg object-cover"
-                          src={project.image}
-                          alt={project.title}
-                        />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {project.title}
-                        </div>
-                        <div className="text-sm text-gray-500">{project.specs}</div>
-                      </div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {lead.name}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{project.location}</div>
-                    <div className="text-sm text-gray-500">{project.city}</div>
+                    <div className="text-sm text-gray-900">{lead.email}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex flex-wrap gap-2">
-                      {project.badges.map((badge, index) => (
-                        <span
-                          key={index}
-                          className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-                        >
-                          {badge}
-                        </span>
-                      ))}
-                    </div>
+                    <div className="text-sm text-gray-900">{lead.phone}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                      {lead.source}
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {project.price}
+                    {lead.date}
                   </td>
                 </tr>
               ))}

@@ -4,13 +4,11 @@ import { useState, useMemo, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { cities, projectTypes, projectStatus } from '@/data/projects';
+import { cities, projectTypes, projectStatus, projects } from '@/data/projects';
 import { projectMedia } from '@/data/projectMedia';
-import { useAppSelector, useAppDispatch } from '@/store/store';
 import CustomDropdown from '@/components/CustomDropdown';
 import Navbar from '../components/Navbar';
 import { Project } from '@/data/projects';
-import { setProjects, setLoading, setError } from '@/store/features/projectsSlice';
 
 const NavbarComponent = dynamic(() => import('../components/Navbar'), {
   ssr: false,
@@ -18,44 +16,11 @@ const NavbarComponent = dynamic(() => import('../components/Navbar'), {
 });
 
 export default function Projects() {
-  const dispatch = useAppDispatch();
-  const { projects, loading } = useAppSelector((state) => state.projects);
   const [selectedCity, setSelectedCity] = useState<string>('all');
   const [selectedType, setSelectedType] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
-
-  // Fetch projects from API on mount
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        dispatch(setLoading(true));
-        const response = await fetch('/api/projects');
-        const data = await response.json();
-        
-        if (response.ok && data.success) {
-          dispatch(setProjects(data.projects));
-        } else {
-          console.error('Failed to fetch projects:', data.error);
-          dispatch(setError(data.error || 'Failed to fetch projects'));
-        }
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-        dispatch(setError('Failed to fetch projects'));
-      } finally {
-        dispatch(setLoading(false));
-      }
-    };
-
-    fetchProjects();
-  }, [dispatch]);
-
-  // Debug log for projects
-  useEffect(() => {
-    console.log('Projects from Redux store:', projects);
-    console.log('Available projects in list:', projects.map(p => ({ id: p.id, title: p.title })));
-  }, [projects]);
 
   const bannerImages = [
     {
@@ -242,17 +207,12 @@ export default function Projects() {
             {/* Results Count */}
             <div className="mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                {loading ? 'Loading...' : `${filteredProjects.length} ${filteredProjects.length === 1 ? 'Project' : 'Projects'} Found`}
+                {filteredProjects.length} Projects Found
               </h2>
             </div>
 
             {/* Projects Grid */}
-            {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {filteredProjects.map((project) => {
                 const media = projectMedia[project.id];
                 // Use fallback image for dynamic projects
@@ -262,7 +222,7 @@ export default function Projects() {
                   <Link
                     key={project.id}
                     href={`/projects/${project.id}`}
-                    className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+                    className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full"
                   >
                     <div className="relative h-48 sm:h-56 lg:h-64">
                       <Image
@@ -271,23 +231,23 @@ export default function Projects() {
                         fill
                         className="object-cover transition-transform duration-300 group-hover:scale-110"
                       />
-                      <div className="absolute top-4 right-4 flex flex-wrap gap-2">
-                        {project.badges.map((badge, index) => (
+                      <div className="absolute top-4  flex flex-wrap gap-2 px-2">
+                        {project.badges.slice(0, 2).map((badge, index) => (
                           <span
                             key={index}
-                            className="px-3 py-1 text-sm font-medium bg-black/75 text-white rounded-full"
+                            className="px-3 py-1 text-xs font-medium bg-black/75 text-white rounded-full"
                           >
                             {badge}
                           </span>
                         ))}
                       </div>
                     </div>
-                    <div className="p-6">
+                    <div className="px-6 pt-6 flex flex-col flex-grow">
                       <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary transition-colors">
                         {project.title}
                       </h3>
-                      <p className="text-gray-600 mb-4">{project.location}, {project.city}</p>
-                      <div className="flex justify-between items-center">
+                      <p className="text-gray-600 mb-4 flex-grow">{project.location}, {project.city}</p>
+                      <div className="flex justify-between items-center mt-auto pt-0" style={{ marginBottom: '20px' }}>
                         <span className="text-lg font-semibold text-primary">
                           {project.price}
                         </span>
@@ -298,10 +258,9 @@ export default function Projects() {
                 );
               })}
             </div>
-            )}
 
             {/* No Results Message */}
-            {!loading && filteredProjects.length === 0 && (
+            {!filteredProjects.length && (
               <div className="text-center py-12">
                 <h3 className="text-xl font-medium text-gray-900 mb-2">No projects found</h3>
                 <p className="text-gray-600">Try adjusting your search or filters</p>
